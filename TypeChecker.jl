@@ -1,15 +1,3 @@
-function isabstract(dt::DataType)
-  length(subtypes(dt)) != 0
-end
-
-function iswobbly(dt::DataType)
-  isabstract(dt)
-end
-
-function iswobbly(ut::UnionType)
-  true
-end
-
 function returnbasedonvalues(args...)
   e = finfer(args...)
   body = e.args[3]
@@ -22,9 +10,9 @@ function returnbasedonvalues(args...)
     end
   end
 
-  if !iswobbly(body.typ) return false end
+  if isleaftype(body.typ) return false end
   for typ in argtypes
-    if iswobbly(typ) # this is an "isabstract"||"isunion" test
+    if !isleaftype(typ)
       return false
     end
   end
