@@ -12,6 +12,9 @@ function returnbasedonvalues(args...)
   end
 
   return true # return is not concrete type; all args are concrete types
+  # what about functions that return an abstract type for other reasons? (bytestring)
+  # what about functions that are just not type-inferred well enough?
+  # if a function takes no arguments, should we return true or false?
 end
 
 # make MethodTable iterable. I like foreach loops. :)
@@ -35,7 +38,7 @@ end
 function check_all_module(m::Module)
   for n in names(m)
     try
-      f = eval(n) # I feel like this will fail
+      f = eval(n) # this fails for Modules != Base
       if isgeneric(f)
         check_function(f)
       end
