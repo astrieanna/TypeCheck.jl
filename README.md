@@ -7,8 +7,8 @@ Julia is a dynamically typed language, but some optional type-checking could com
 
 The goal is to detect:
 
-1. **Places type inference fails**
-     (places where a normal typechecker would reject the program)
+1. **Places where a normal typechecker would reject the program**
+     (for example, when a no method error would probably occur)
 2. **Unstable types**
      (places where the type of a variable changes over the course of a loop)
 3. **Functions whose return type depends on the values (rather than types) of its arguments**
