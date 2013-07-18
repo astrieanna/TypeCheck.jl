@@ -3,7 +3,7 @@ function returnbasedonvalues(args...)
   body = e.args[3]
   if isleaftype(body.typ) return false end
 
-  argnames = e.args[1]
+  argnames = map(x -> isa(x,Symbol) ? x : x.args[1],e.args[1])
   argtuples = e.args[2][2]
   for (sym,typ,x) in argtuples
     if contains(argnames,sym) && (!isleaftype(typ))
