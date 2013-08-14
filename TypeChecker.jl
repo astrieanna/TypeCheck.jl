@@ -1,5 +1,5 @@
 function returnbasedonvalues(args...)
-  e = finfer(args...)
+  e = code_typed(args...)[1] #why does this return an array? when would it be of size != 1?
   body = e.args[3]
   if isleaftype(body.typ) return false end
 
@@ -17,12 +17,6 @@ function returnbasedonvalues(args...)
   # if a function takes no arguments, should we return true or false?
 end
 
-# make MethodTable iterable. I like foreach loops. :)
-Base.start(mt::MethodTable)           = mt.defs
-Base.next(mt::MethodTable, m::Method) = (m,m.next)
-Base.done(mt::MethodTable, m::Method) = false 
-Base.done(mt::MethodTable, i::())     = true
-
 # check all the methods of a generic function
 function check_function(f) #f should be a generic function
   i = 0
@@ -38,7 +32,7 @@ end
 function check_all_module(m::Module)
   for n in names(m)
     try
-      f = eval(n) # this fails for Modules != Base
+      f = eval(n)
       if isgeneric(f)
         check_function(f)
       end
