@@ -1,7 +1,7 @@
 function returnbasedonvalues(args...)
   e = code_typed(args...)[1] #why does this return an array? when would it be of size != 1?
   body = e.args[3]
-  if isleaftype(body.typ) return (body.typ,false) end
+  if isleaftype(body.typ) || body.typ == None return (body.typ,false) end
 
   argnames = map(x -> isa(x,Symbol) ? x : x.args[1],e.args[1])
   argtuples = e.args[2][2]
