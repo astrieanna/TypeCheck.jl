@@ -1,7 +1,9 @@
-function returnbasedonvalues(args...)
+function returnbasedonvalues(args...;istrunion=false,ibytestring=false)
   e = code_typed(args...)[1] #why does this return an array? when would it be of size != 1?
   body = e.args[3]
   if isleaftype(body.typ) || body.typ == None return (body.typ,false) end
+  if istrunion && body.typ == Union(ASCIIString, UTF8String) return (body.typ,false) end
+  if ibytestring && body.typ == ByteString return (body.typ,false) end
 
   argnames = map(x -> isa(x,Symbol) ? x : x.args[1],e.args[1])
   argtuples = e.args[2][2]
@@ -22,7 +24,7 @@ end
 function check_function(f) #f should be a generic function
   i = 0
   for m in f.env
-    (typ,b) = returnbasedonvalues(f,m.sig)
+    (typ,b) = returnbasedonvalues(f,m.sig;istrunion=true)
     if b
       println("$(f.env.name)$(m.sig)::$typ failed")
     end
