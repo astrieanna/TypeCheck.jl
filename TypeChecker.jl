@@ -29,7 +29,7 @@ function check_return_value(args...)
   lines = ASCIIString[]
   (typ,b) = returnbasedonvalues(args...;istrunion=true)
   if b
-    push!(lines,"$(f.env.name)$(m.sig)::$typ failed")
+    push!(lines,"\t\t$(f.env.name)$(m.sig)::$typ failed")
   end
   lines
 end
@@ -39,7 +39,11 @@ function check_function(f;foo=check_return_value) #f should be a generic functio
   i = 0
   lines = ASCIIString[]
   for m in f.env
-    append!(lines,foo(f,m.sig))
+    ll = foo(f,m.sig)
+    if !isempty(ll)
+      push!(lines,"\t$(m.sig):")
+      append!(lines,foo(f,m.sig))
+    end
     i += 1
   end
   lines
@@ -91,7 +95,7 @@ function loopcontents(args...)
       #elseif typeof(body[i]) != LineNumberNode
       #  println("$i: ", typeof(body[i]))
       #end
-      push!(lines,body[i])
+      push!(lines,(i,body[i]))
     end
 
     if typeof(body[i]) == GotoNode && contains(loops,i)
@@ -105,7 +109,7 @@ end
 
 function find_loose_types(arr::Vector)
   lines = ASCIIString[]
-  for e in arr
+  for (i,e) in arr
     if typeof(e) == Expr
       es = copy(e.args)
       while !isempty(es)
@@ -113,7 +117,7 @@ function find_loose_types(arr::Vector)
         if typeof(e1) == Expr
           append!(es,e1.args)
         elseif typeof(e1) == SymbolNode && !isleaftype(e1.typ) && typeof(e1.typ) == UnionType
-          push!(lines,"\t$(e1.name): $(e1.typ) WARNING")
+          push!(lines,"\t\t$i: $(e1.name): $(e1.typ)")
         end 
       end                          
     end
