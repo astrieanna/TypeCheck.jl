@@ -29,7 +29,7 @@ function check_return_value(args...)
   lines = ASCIIString[]
   (typ,b) = returnbasedonvalues(args...;istrunion=true)
   if b
-    push!(lines,"\t\t$(f.env.name)$(m.sig)::$typ failed")
+    push!(lines,"::$typ failed")
   end
   lines
 end
@@ -41,8 +41,8 @@ function check_function(f;foo=check_return_value) #f should be a generic functio
   for m in f.env
     ll = foo(f,m.sig)
     if !isempty(ll)
-      push!(lines,"\t$(m.sig):")
-      append!(lines,foo(f,m.sig))
+      ll[1] = "\t$(m.sig):" * ll[1]
+      append!(lines,ll)
     end
     i += 1
   end
@@ -122,7 +122,7 @@ function find_loose_types(arr::Vector)
       end                          
     end
   end
-  lines
+  isempty(lines) ? lines : unshift!(lines,"")
 end
 
 check_loop_types(args...) = find_loose_types(loopcontents(args...))
