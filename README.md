@@ -14,12 +14,12 @@ The goal is to detect:
 2. **Unstable types**
      (places where the type of a variable changes over the course of a loop)
 
-        require("TypeChecker.jl")
+        require("TypeCheck.jl")
         check_all_module(Base;foo=check_loop_types)
 
 3. **Functions whose return type depends on the values (rather than types) of its arguments**
 
-        require("TypeChecker.jl")
+        require("TypeCheck.jl")
         check_all_module(Base;foo=check_return_value)
 
 ## API
