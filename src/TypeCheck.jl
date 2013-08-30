@@ -3,40 +3,6 @@
 module TypeCheck
   export check_all_module, check_function, check_loop_types, check_return_value
 
-  # The goal of this function is, given one method of a generic function,
-  # determine whether it's return type might change based on input values rather than input types
-  # It takes the same arguments as code_typed
-  function returnbasedonvalues(args...;istrunion=false,ibytestring=false)
-    e = code_typed(args...)[1] #why does this return an array? when would it be of size != 1?
-    body = e.args[3]
-    if isleaftype(body.typ) || body.typ == None return (body.typ,false) end
-    if istrunion && body.typ == Union(ASCIIString, UTF8String) return (body.typ,false) end
-    if ibytestring && body.typ == ByteString return (body.typ,false) end
-  
-    argnames = map(x -> isa(x,Symbol) ? x : x.args[1],e.args[1])
-    argtuples = e.args[2][2]
-    for (sym,typ,x) in argtuples
-      if contains(argnames,sym) && (!isleaftype(typ))
-        return (body.typ,false)
-      end
-    end
-  
-    return (body.typ,true)
-    # return is not concrete type; all args are concrete types
-    # what about functions that return an abstract type for other reasons? (bytestring)
-    # what about functions that are just not type-inferred well enough?
-    # if a function takes no arguments, should we return true or false?
-  end
-
-  function check_return_value(args...)
-    lines = ASCIIString[]
-    (typ,b) = returnbasedonvalues(args...;istrunion=true)
-    if b
-      push!(lines,"::$typ failed")
-    end
-    lines
-  end
-
   # check all the methods of a generic function
   function check_function(f;foo=check_return_value) #f should be a generic function
     i = 0
@@ -69,6 +35,48 @@ module TypeCheck
       end
     end
   end
+
+
+## Checking that return values are base only on input *types*, not values.
+
+  function check_return_value(args...)
+    lines = ASCIIString[]
+    (typ,b) = returnbasedonvalues(args...;istrunion=true)
+    if b
+      push!(lines,"::$typ failed")
+    end
+    lines
+  end
+  
+  # The goal of this function is, given one method of a generic function,
+  # determine whether it's return type might change based on input values rather than input types
+  # It takes the same arguments as code_typed
+  function returnbasedonvalues(args...;istrunion=false,ibytestring=false)
+    e = code_typed(args...)[1] #why does this return an array? when would it be of size != 1?
+    body = e.args[3]
+    if isleaftype(body.typ) || body.typ == None return (body.typ,false) end
+    if istrunion && body.typ == Union(ASCIIString, UTF8String) return (body.typ,false) end
+    if ibytestring && body.typ == ByteString return (body.typ,false) end
+  
+    argnames = map(x -> isa(x,Symbol) ? x : x.args[1],e.args[1])
+    argtuples = e.args[2][2]
+    for (sym,typ,x) in argtuples
+      if contains(argnames,sym) && (!isleaftype(typ))
+        return (body.typ,false)
+      end
+    end
+  
+    return (body.typ,true)
+    # return is not concrete type; all args are concrete types
+    # what about functions that return an abstract type for other reasons? (bytestring)
+    # what about functions that are just not type-inferred well enough?
+    # if a function takes no arguments, should we return true or false?
+  end
+
+
+## Checking that variables in loops have concrete types that do not vary
+  
+  check_loop_types(args...) = find_loose_types(loopcontents(args...))
   
   # This is a function for trying to detect loops in a method of a generic function
   # It takes the same arguments as code_typed
@@ -127,6 +135,5 @@ module TypeCheck
     end
     isempty(lines) ? lines : unshift!(lines,"")
   end
-  
-  check_loop_types(args...) = find_loose_types(loopcontents(args...))
-end  
+
+end  #end module
