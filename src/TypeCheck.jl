@@ -136,4 +136,32 @@ module TypeCheck
     isempty(lines) ? lines : unshift!(lines,"")
   end
 
+## Check method calls
+
+  check_method_calls(args...) = check_methods_exist(find_method_calls(args...))
+  
+  function check_methods_exist(arr)
+    lines = ASCIIString[]
+    for e in arr
+      push!(lines,"\t\t$(show(e))")
+    end
+    lines
+  end
+
+  function find_method_calls(args...)
+    e = code_typed(args...)[1]
+    body = e.args[3].args
+    lines = {}
+    for b in body
+      if typeof(b) == Expr
+        if b.head == :return
+          append!(body,b.args)
+        elseif b.head == :call
+          push!(lines,b.args)
+        end 
+      end
+    end
+    lines
+  end
+
 end  #end module
