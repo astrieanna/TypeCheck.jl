@@ -146,9 +146,9 @@ module TypeCheck
   check_method_calls(args...) = check_methods_exist(find_method_calls(args...))
   
   function check_methods_exist(arr)
-    lines = ASCIIString[]
+    lines = ASCIIString[""]
     for e in arr
-      push!(lines,"\t\t$(show(e))")
+      append!(lines,["\t\t$s" for s in split("$e",['\n'])])
     end
     lines
   end
