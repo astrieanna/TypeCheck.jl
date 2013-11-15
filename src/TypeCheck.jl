@@ -66,7 +66,7 @@ module TypeCheck
     argnames = map(x -> isa(x,Symbol) ? x : x.args[1],e.args[1])
     argtuples = e.args[2][2]
     for (sym,typ,x) in argtuples
-      if contains(argnames,sym) && (!isleaftype(typ))
+      if in(sym,argnames) && (!isleaftype(typ))
         return (body.typ,false)
       end
     end
@@ -114,7 +114,7 @@ module TypeCheck
         push!(lines,(i,body[i]))
       end
 
-      if typeof(body[i]) == GotoNode && contains(loops,i)
+      if typeof(body[i]) == GotoNode && in(i,loops)
         splice!(loops,findfirst(loops,i))
         nesting -= 1
         #println("$i: END LOOP: jumps to ",body[i].label)
