@@ -4,12 +4,12 @@ module TypeCheck
   export check_all_module, check_function, check_loop_types, check_return_value
 
   # check all the methods of a generic function
-  function check_function(f;foo=check_return_value) #f should be a generic function
+  function check_function(f;foo=check_return_value,kwargs...) #f should be a generic function
     i = 0
     lines = ASCIIString[]
     count = 0
     for m in f.env
-      ll = foo(f,m.sig)
+      ll = foo(f,m.sig;kwargs...)
       if !isempty(ll)
         ll[1] = "\t$(m.sig):" * ll[1]
         count += 1
@@ -21,13 +21,13 @@ module TypeCheck
   end
   
   # check all the generic functions in a module
-  function check_all_module(m::Module;foo=check_return_value)
+  function check_all_module(m::Module;kwargs...)
     score = 0
     for n in names(m)
       try
         f = eval(m,n)
         if isgeneric(f)
-          (lines,count) = check_function(f;foo=foo)
+          (lines,count) = check_function(f;kwargs...)
           score += count
           if !isempty(lines)
             println("$n:")
@@ -44,9 +44,9 @@ module TypeCheck
 
 ## Checking that return values are base only on input *types*, not values.
 
-  function check_return_value(args...)
+  function check_return_value(args...;kwargs...)
     lines = ASCIIString[]
-    (typ,b) = returnbasedonvalues(args...;istrunion=true)
+    (typ,b) = returnbasedonvalues(args...;kwargs...)
     if b
       push!(lines,"::$typ failed")
     end
