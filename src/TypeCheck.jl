@@ -3,6 +3,8 @@
 module TypeCheck
   export check_all_module, check_function, check_loop_types, check_return_value
 
+  include("Helpers.jl")
+
   # check all the methods of a generic function
   function check_function(f;foo=check_return_value,kwargs...) #f should be a generic function
     i = 0
