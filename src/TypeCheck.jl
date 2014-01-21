@@ -7,19 +7,10 @@ module TypeCheck
 
   # check all the methods of a generic function
   function check_function(f;foo=check_return_value,kwargs...) #f should be a generic function
-    i = 0
-    lines = ASCIIString[]
-    count = 0
-    for m in f.env
-      ll = foo(f,m.sig;kwargs...)
-      if !isempty(ll)
-        ll[1] = "\t$(m.sig):" * ll[1]
-        count += 1
-        append!(lines,ll)
-      end
-      i += 1
-    end
-    (lines,count)
+    results = [let r=foo(e;kwargs...) in
+               ("\t$(argtypes(e)): $r[1])",r[2]) end for e in code_typed(f)]
+    results = filter(x-> x[2], results)
+    (join(results,"\n"),length(results))
   end
   
   # check all the generic functions in a module
@@ -46,58 +37,49 @@ module TypeCheck
 
 ## Checking that return values are base only on input *types*, not values.
 
-  function check_return_value(args...;kwargs...)
-    lines = ASCIIString[]
-    (typ,b) = returnbasedonvalues(args...;kwargs...)
-    if b
-      push!(lines,"::$typ failed")
-    end
-    lines
+  function check_return_value(e::Expr;kwargs...)
+    (typ,b) = returnbasedonvalues(e;kwargs...)
+    return b ? ("::$typ failed",b) : ("::$typ passed",b)
   end
   
   # The goal of this function is, given one method of a generic function,
   # determine whether it's return type might change based on input values rather than input types
-  # It takes the same arguments as code_typed
-  function returnbasedonvalues(args...;istrunion=false,ibytestring=false)
-    e = code_typed(args...)[1] #why does this return an array? when would it be of size != 1?
-    body = e.args[3]
-    if isleaftype(body.typ) || body.typ == None return (body.typ,false) end
-    if istrunion && body.typ == Union(ASCIIString, UTF8String) return (body.typ,false) end
-    if ibytestring && body.typ == ByteString return (body.typ,false) end
-  
-    argnames = map(x -> isa(x,Symbol) ? x : x.args[1],e.args[1])
-    argtuples = e.args[2][2]
-    for (sym,typ,x) in argtuples
-      if in(sym,argnames) && (!isleaftype(typ))
-        return (body.typ,false)
-      end
+  function returnbasedonvalues(e::Expr;istrunion=false,ibytestring=false)
+    rt = returntype(e)
+    ts = argtypes(e)
+
+    if isleaftype(rt) || rt == None return (rt,false) end
+    if istrunion && rt == Union(ASCIIString,UTF8String) return (rt,false) end
+    if ibytestring && rt == ByteString return (rt,false) end
+
+    for t in ts
+     if !isleaftype(t)
+       return (rt,false)
+     end
     end
-  
-    return (body.typ,true)
-    # return is not concrete type; all args are concrete types
+
+    return (rt,true) # return is not concrete type; all args are concrete types
+  end
     # what about functions that return an abstract type for other reasons? (bytestring)
     # what about functions that are just not type-inferred well enough?
     # if a function takes no arguments, should we return true or false?
-  end
 
 
 ## Checking that variables in loops have concrete types that do not vary
   
-  check_loop_types(args...) = find_loose_types(loopcontents(args...))
+  check_loop_types(e::Expr) = find_loose_types(loopcontents(e))
   
   # This is a function for trying to detect loops in a method of a generic function
-  # It takes the same arguments as code_typed
   # And returns the lines that are inside one or more loops
-  function loopcontents(args...)
-    e = code_typed(args...)[1]
-    body = e.args[3].args
+  function loopcontents(e)
+    b = body(e)
     loops = Int[]
     nesting = 0
     lines = {}
-    for i in 1:length(body)
-      if typeof(body[i]) == LabelNode
-        l = body[i].label
-        jumpback = findnext(x-> typeof(x) == GotoNode && x.label == l, body, i)
+    for i in 1:length(b)
+      if typeof(b[i]) == LabelNode
+        l = b[i].label
+        jumpback = findnext(x-> typeof(x) == GotoNode && x.label == l, b, i)
         if jumpback != 0
           #println("$i: START LOOP: ends at $jumpback")
           push!(loops,jumpback)
@@ -106,20 +88,20 @@ module TypeCheck
       end
 
       if nesting > 0
-        #if typeof(body[i]) == Expr
-        #  println("$i: \t", body[i])
-        #elseif typeof(body[i]) == LabelNode || typeof(body[i]) == GotoNode
-        #  println("$i: ", typeof(body[i]), " ", body[i].label)
-        #elseif typeof(body[i]) != LineNumberNode
-        #  println("$i: ", typeof(body[i]))
+        #if typeof(b[i]) == Expr
+        #  println("$i: \t", b[i])
+        #elseif typeof(b[i]) == LabelNode || typeof(b[i]) == GotoNode
+        #  println("$i: ", typeof(b[i]), " ", b[i].label)
+        #elseif typeof(b[i]) != LineNumberNode
+        #  println("$i: ", typeof(b[i]))
         #end
-        push!(lines,(i,body[i]))
+        push!(lines,(i,b[i]))
       end
 
-      if typeof(body[i]) == GotoNode && in(i,loops)
+      if typeof(b[i]) == GotoNode && in(i,loops)
         splice!(loops,findfirst(loops,i))
         nesting -= 1
-        #println("$i: END LOOP: jumps to ",body[i].label)
+        #println("$i: END LOOP: jumps to ",b[i].label)
       end
     end
     lines
@@ -140,12 +122,12 @@ module TypeCheck
         end                          
       end
     end
-    isempty(lines) ? lines : unshift!(lines,"")
+    return isempty(lines) ? lines : unshift!(lines,"")
   end
 
 ## Check method calls
 
-  check_method_calls(args...) = check_methods_exist(find_method_calls(args...))
+  check_method_calls(e) = check_methods_exist(find_method_calls(e))
   
   function check_methods_exist(arr)
     lines = ASCIIString[""]
@@ -155,11 +137,10 @@ module TypeCheck
     lines
   end
 
-  function find_method_calls(args...)
-    e = code_typed(args...)[1]
-    body = e.args[3].args
+  function find_method_calls(e)
+    bod = body(e)
     lines = {}
-    for b in body
+    for b in bod
       if typeof(b) == Expr
         if b.head == :return
           append!(body,b.args)
