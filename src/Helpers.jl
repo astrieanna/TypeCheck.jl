@@ -17,12 +17,16 @@ function extract_calls_from_returns(e::Expr)
 end
 
 # for a function, get the types of the arguments for each call inside a return
-argtypes(e::Expr) = [Symbol[expr_type(e) for e in call.args[2:]] for call in extract_calls_from_returns(e)]
+#argtypes(e::Expr) = [Symbol[expr_type(e) for e in call.args[2:]] for call in extract_calls_from_returns(e)]
 
 # for a function, get the types of each of the arguments in the signature
 function argtypes(e::Expr)
   argtuples = filter(x->x[1] in e.args[1], e.args[2][2]) #only arguments, no local vars
-  Union(DataType,UnionType)[t[2] for t in argtuples]
+  @show AType[t[2] for t in argtuples]
+end
+
+function string_of_argtypes(arr::Vector{AType})
+  join([string(a) for a in arr],",")
 end
 
 # Given an expression, return it's type when used in a method call

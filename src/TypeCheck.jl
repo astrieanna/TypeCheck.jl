@@ -6,11 +6,16 @@ module TypeCheck
   include("Helpers.jl")
 
   # check all the methods of a generic function
-  function check_function(f;foo=check_return_value,kwargs...) #f should be a generic function
-    results = [let r=foo(e;kwargs...) in
-               ("\t$(argtypes(e)): $r[1])",r[2]) end for e in code_typed(f)]
-    results = filter(x-> x[2], results)
-    (join(results,"\n"),length(results))
+  function _check_function(f;foo=check_return_value,kwargs...) #f should be a generic function
+    results = [tuple(e,foo(e;kwargs...)...) for e in code_typed(f)]
+    presults = [("\t($(string_of_argtypes(argtypes(r[1]))))$(r[2])",r[3]) for r in results]
+    presults = [r[1] for r in filter(x-> x[2], presults)]
+    (presults,length(presults))
+  end
+
+  function check_function(f;kwargs...)
+    (results,count) = _check_function(f;kwargs...)
+    print(results)
   end
   
   # check all the generic functions in a module
@@ -20,7 +25,7 @@ module TypeCheck
       try
         f = eval(m,n)
         if isgeneric(f)
-          (lines,count) = check_function(f;kwargs...)
+          (lines,count) = _check_function(f;kwargs...)
           score += count
           if !isempty(lines)
             println("$n:")
