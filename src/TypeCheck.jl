@@ -7,6 +7,7 @@ module TypeCheck
 
   # check all the methods of a generic function
   function _check_function(f;foo=check_return_value,kwargs...) #f should be a generic function
+    #@show f
     results = [tuple(e,foo(e;kwargs...)...) for e in code_typed(f)]
     presults = [("\t($(string_of_argtypes(argtypes(r[1]))))$(r[2])",r[3]) for r in results]
     presults = [r[1] for r in filter(x-> x[2], presults)]
@@ -22,9 +23,9 @@ module TypeCheck
   function check_all_module(m::Module;kwargs...)
     score = 0
     for n in names(m)
-      try
+#      try
         f = eval(m,n)
-        if isgeneric(f)
+        if isgeneric(f) && typeof(f) == Function
           (lines,count) = _check_function(f;kwargs...)
           score += count
           if !isempty(lines)
@@ -32,9 +33,9 @@ module TypeCheck
             for l in lines println(l) end
           end
         end
-      catch e
-        println("$n: $e")
-      end
+#      catch e
+#        println("$n: $e")
+#      end
     end
     println("The total number of failed methods in $m is $score")
   end

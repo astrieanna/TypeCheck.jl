@@ -1,5 +1,7 @@
-
-AType = Union(DataType,UnionType)
+AtomicType = Union(DataType,UnionType,TypeVar,TypeConstructor,())
+AType = Union(AtomicType,(AtomicType,),(AtomicType,AtomicType),
+              (AtomicType,AtomicType,AtomicType),
+              (AtomicType,AtomicType,AtomicType,AtomicType))
 
 function Base.code_typed(f::Function)
   lengths = Set(Int64[length(m.sig) for m in f.env]...)
@@ -22,7 +24,7 @@ end
 # for a function, get the types of each of the arguments in the signature
 function argtypes(e::Expr)
   argtuples = filter(x->x[1] in e.args[1], e.args[2][2]) #only arguments, no local vars
-  @show AType[t[2] for t in argtuples]
+  AType[t[2] for t in argtuples]
 end
 
 function string_of_argtypes(arr::Vector{AType})
