@@ -23,7 +23,7 @@ module TypeCheck
   function check_all_module(m::Module;kwargs...)
     score = 0
     for n in names(m)
-#      try
+      try
         f = eval(m,n)
         if isgeneric(f) && typeof(f) == Function
           (lines,count) = _check_function(f;kwargs...)
@@ -33,9 +33,9 @@ module TypeCheck
             for l in lines println(l) end
           end
         end
-#      catch e
-#        println("$n: $e")
-#      end
+      catch e
+        println("$n: $e")
+      end
     end
     println("The total number of failed methods in $m is $score")
   end
