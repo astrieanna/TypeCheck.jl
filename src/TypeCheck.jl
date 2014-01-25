@@ -11,6 +11,7 @@ module TypeCheck
     results = [tuple(e,foo(e;kwargs...)...) for e in code_typed(f)]
     presults = [("\t($(string_of_argtypes(argtypes(r[1]))))$(r[2])",r[3]) for r in results]
     presults = [r[1] for r in filter(x-> x[2], presults)]
+    #presults = [r[1] for r in presults]
     (presults,length(presults))
   end
 
@@ -64,6 +65,14 @@ module TypeCheck
      end
     end
 
+    cs = [expr_type(c) for c in extract_calls_from_returns(e)]
+    for c in cs
+      if rt == c
+         return (rt,false)
+      end
+    end
+
+    #@show cs
     return (rt,true) # return is not concrete type; all args are concrete types
   end
     # what about functions that return an abstract type for other reasons? (bytestring)
