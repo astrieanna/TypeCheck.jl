@@ -1,5 +1,6 @@
 TypeCheck.jl
 ============
+[![Build Status](https://travis-ci.org/astrieanna/TypeCheck.jl.png?branch=master)](https://travis-ci.org/astrieanna/TypeCheck.jl)
 
 A (work-in-progress) TypeChecker for the Julia programming language.
 
