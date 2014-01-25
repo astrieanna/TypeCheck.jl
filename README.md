@@ -3,6 +3,9 @@ TypeCheck.jl
 
 A (work-in-progress) TypeChecker for the Julia programming language.
 
+##WARNING: under active development. Expect some (or all) of the below to be out of date.
+
+
 Julia is a dynamically typed language, but some optional type-checking could come in handy.
 
 The goal is to detect:
