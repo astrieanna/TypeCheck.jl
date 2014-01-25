@@ -24,7 +24,7 @@ function extract_calls_from_returns(e::Expr)
 end
 
 # get function name and the types of the arguments for a Expr with head :call
-call_info(call::Expr) = (call.args[1], AType[expr_type(e) for e in call.args[2:]])
+call_info(call::Expr) = (call.args[1], AType[expr_type(e) for e in call.args[2:end]])
 
 # for a function, get the types of each of the arguments in the signature
 function argtypes(e::Expr)
@@ -60,7 +60,7 @@ function expr_type(expr::Expr)
     elseif typeof(expr.args[1]) == Symbol
       if expr.typ != Any
         return expr.typ
-      elseif LambdaStaticData in [typeof(x) for x in expr.args[2:]]
+      elseif LambdaStaticData in [typeof(x) for x in expr.args[2:end]]
         return expr.typ
       end
 
@@ -73,7 +73,7 @@ function expr_type(expr::Expr)
       if typeof(f) != Function || !isgeneric(f)
         return expr.typ 
       end
-      fargtypes = tuple([expr_type(e) for e in expr.args[2:]]...)
+      fargtypes = tuple([expr_type(e) for e in expr.args[2:end]]...)
       us = Union([returntype(e2) for e2 in code_typed(f,fargtypes)]...)
       return us
     end
