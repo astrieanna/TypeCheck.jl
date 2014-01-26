@@ -15,4 +15,5 @@ before_install:
 script:
   - julia -e 'Pkg.init(); run(`ln -s $(pwd()) $(Pkg.dir("TypeCheck"))`); Pkg.pin("TypeCheck"); Pkg.resolve()'
   - julia -e 'using TypeCheck; @assert isdefined(:TypeCheck); @assert typeof(TypeCheck) === Module'
+  - julia -e 'Pkg.add("FactCheck");Pkg.checkout("FactCheck")'
   - julia test/test.jl
