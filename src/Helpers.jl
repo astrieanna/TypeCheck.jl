@@ -8,6 +8,23 @@ AType = Union(AtomicType,(AtomicType,),
               (AtomicType,AtomicType,AtomicType,AtomicType,AtomicType,AtomicType),
               (AtomicType,AtomicType,AtomicType,AtomicType,AtomicType,AtomicType,AtomicType))
 
+istype(t::DataType) = true
+istype(t::UnionType) = true
+istype(t::TypeVar) = true
+istype(t::TypeConstructor) = true
+istype(x::(Any,)) = istype(x[1])
+istype(x::(Any,Any)) = istype(x[1]) && istype(x[2])
+function istype(t) 
+  if Base.isType(t) 
+    return true
+  elseif length(t) == 1
+    return false
+  elseif tuple(t...) == t
+    return all(map(istype,t))
+  end
+  return false
+end
+
 function Base.code_typed(f::Function)
   lengths = Set(Int64[length(m.sig) for m in f.env]...)
   vcat([code_typed(f, tuple([Any for x in 1:l]...)) for l in lengths]...)
@@ -46,13 +63,12 @@ expr_type(e) = typeof(e)
 
 expr_type(q::QuoteNode) = typeof(@show q)
 
-is_top(e::Expr) = is_call(e) && typeof(e.args[1]) == TopNode
-is_call(e::Expr) = e.head == :call
+is_top(e) = Base.is_expr(e,:call) && typeof(e.args[1]) == TopNode
 
 function expr_type(expr::Expr)
   if is_top(expr)
     return expr.typ 
-  elseif is_call(expr)
+  elseif Base.is_expr(expr,:call)
     if typeof(expr.args[1]) == Expr && is_top(expr.args[1])
       return expr_type(expr.args[1])
     elseif typeof(expr.args[1]) == SymbolNode # (func::F) -- non-generic function
