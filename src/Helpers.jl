@@ -25,6 +25,24 @@ function istype(t)
   return false
 end
 
+function _whos(e::Expr)
+  vars = sort(e.args[2][2];by=x->x[1])
+  [println("\t",x[1],"\t",x[2]) for x in vars]
+end
+
+function Base.whos(f,args...)
+  for e in code_typed(f,args...)
+    println(signature(e))
+    _whos(e)                                
+    println("")
+  end
+end
+
+function signature(e::Expr)
+  r = returntype(e) 
+ "($(string_of_argtypes(argtypes(e))))::$(r)"
+end
+
 function Base.code_typed(f::Function)
   lengths = Set(Int64[length(m.sig) for m in f.env]...)
   vcat([code_typed(f, tuple([Any for x in 1:l]...)) for l in lengths]...)
