@@ -21,15 +21,11 @@ module TypeCheck
   function check_all_module(m::Module;kwargs...)
     score = 0
     for n in names(m)
-      try
-        f = eval(m,n)
-        if isgeneric(f) && typeof(f) == Function
-          (fm,count) = _check_function(f;kwargs...)
-          score += count
-          display(fm)
-        end
-      catch e
-        println("$n: $e")
+      f = eval(m,n)
+      if isgeneric(f) && typeof(f) == Function
+        fm = _check_function(f;kwargs...)
+        score += length(fm.methods)
+        display(fm)
       end
     end
     println("The total number of failed methods in $m is $score")
