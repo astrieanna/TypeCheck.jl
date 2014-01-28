@@ -1,7 +1,7 @@
 # These are some functions to allow static type-checking of Julia programs
 
 module TypeCheck
-  export check_all_module, check_loop_types, check_return_value
+  export check_loop_types, check_return_value
 
   include("Helpers.jl")
 
@@ -23,6 +23,7 @@ module TypeCheck
     typs::Vector{AType}
     returntype::Type
   end
+  MethodSignature(e::Expr) = MethodSignature(argtypes(e),returntype(e))
 
   type FunctionSignature
     methods::Vector{MethodSignature}
@@ -88,7 +89,41 @@ module TypeCheck
 
 ## Checking that variables in loops have concrete types that do not vary
   
-  check_loop_types(e::Expr) = find_loose_types(loopcontents(e))
+  type LoopResult
+    msig::MethodSignature
+    lines::Vector{(Symbol,Type)}
+    LoopResult(ms::MethodSignature,ls::Vector{(Symbol,Type)}) = new(ms,unique(ls))
+  end
+
+  function Base.writemime(io, ::MIME"text/plain", x::LoopResult)
+    display(x.msig)
+    for (s,t) in x.lines
+      println(io,"\t",string(s),"::",string(t))
+    end
+  end
+
+  type LoopResults
+    name::Symbol
+    methods::Vector{LoopResult}
+  end
+
+  function Base.writemime(io, ::MIME"text/plain", x::LoopResults)
+    for lr in x.methods
+      print(io,string(x.name))
+      display(lr)
+    end
+  end
+
+  check_loop_types(m::Module) = check_all_module(m;test=check_loop_types)
+  check_loop_types(e::Expr) = find_loose_types(e,loopcontents(e))
+  function check_loop_types(f::Function)
+    lrs = LoopResult[]
+    for e in code_typed(f)
+      lr = check_loop_types(e)
+      if length(lr.lines) > 0 push!(lrs,lr) end
+    end
+    LoopResults(f.env.name,lrs)
+  end
   
   # This is a function for trying to detect loops in a method of a generic function
   # And returns the lines that are inside one or more loops
@@ -96,7 +131,7 @@ module TypeCheck
     b = body(e)
     loops = Int[]
     nesting = 0
-    lines = Union(Expr,LabelNode)[] 
+    lines = {}
     for i in 1:length(b)
       if typeof(b[i]) == LabelNode
         l = b[i].label
@@ -119,9 +154,9 @@ module TypeCheck
     lines
   end
 
-  function find_loose_types(arr::Vector)
-    lines = ASCIIString[]
-    for (i,e) in arr
+  function find_loose_types(method::Expr,lr::Vector)
+    lines = (Symbol,Type)[]
+    for (i,e) in lr
       if typeof(e) == Expr
         es = copy(e.args)
         while !isempty(es)
@@ -129,12 +164,12 @@ module TypeCheck
           if typeof(e1) == Expr
             append!(es,e1.args)
           elseif typeof(e1) == SymbolNode && !isleaftype(e1.typ) && typeof(e1.typ) == UnionType
-            push!(lines,"\t\t$i: $(e1.name): $(e1.typ)")
+            push!(lines,(e1.name,e1.typ))
           end 
         end                          
       end
     end
-    return isempty(lines) ? (lines,false) : (unshift!(lines,""),true)
+    return LoopResult(MethodSignature(method),lines)
   end
 
 ## Check method calls
