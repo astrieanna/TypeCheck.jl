@@ -7,17 +7,14 @@ module TypeCheck
 
   # check all the methods of a generic function
   function _check_function(f;foo=check_return_value,kwargs...) #f should be a generic function
-    #@show f
-    results = [tuple(e,foo(e;kwargs...)...) for e in code_typed(f)]
-    presults = [("\t($(string_of_argtypes(argtypes(r[1]))))$(r[2])",r[3]) for r in results]
-    presults = [r[1] for r in filter(x-> x[2], presults)]
-    #presults = [r[1] for r in presults]
-    (presults,length(presults))
+    results = [foo(e;kwargs...) for e in code_typed(f)]
+    results = [r[1] for r in filter(x-> x[2], results)]
+    (FunctionSignature(results,f.env.name),length(results))
   end
 
   function check_function(f;kwargs...)
     (results,count) = _check_function(f;kwargs...)
-    print(results)
+    results
   end
   
   # check all the generic functions in a module
@@ -27,12 +24,9 @@ module TypeCheck
       try
         f = eval(m,n)
         if isgeneric(f) && typeof(f) == Function
-          (lines,count) = _check_function(f;kwargs...)
+          (fm,count) = _check_function(f;kwargs...)
           score += count
-          if !isempty(lines)
-            println("$n:")
-            for l in lines println(l) end
-          end
+          display(fm)
         end
       catch e
         println("$n: $e")
@@ -44,9 +38,27 @@ module TypeCheck
 
 ## Checking that return values are base only on input *types*, not values.
 
+  type MethodSignature
+    typs::Vector{AType}
+    returntype::Type
+  end
+
+  type FunctionSignature
+    methods::Vector{MethodSignature}
+    name::Symbol
+  end
+
+  Base.writemime(io, ::MIME"text/plain", x::MethodSignature) = println(io,"(",string_of_argtypes(x.typs),")::",x.returntype)
+  function Base.writemime(io, ::MIME"text/plain", x::FunctionSignature)
+    for m in x.methods
+      print(io,string(x.name))
+      display(m)
+    end
+  end
+
   function check_return_value(e::Expr;kwargs...)
     (typ,b) = returnbasedonvalues(e;kwargs...)
-    return b ? ("::$typ failed",b) : ("::$typ passed",b)
+    (MethodSignature(argtypes(e),typ),b)
   end
   
   # The goal of this function is, given one method of a generic function,
