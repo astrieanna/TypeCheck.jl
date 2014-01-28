@@ -1,7 +1,7 @@
 # These are some functions to allow static type-checking of Julia programs
 
 module TypeCheck
-  export check_loop_types, check_return_value
+  export check_return_values, check_loop_types, check_method_calls
 
   include("Helpers.jl")
 
@@ -174,7 +174,15 @@ module TypeCheck
 
 ## Check method calls
 
-  check_method_calls(e) = check_methods_exist(find_method_calls(e))
+  check_method_calls(m::Module) = check_all_module(m;test=check_method_calls)
+  check_method_calls(e::Expr) = check_methods_exist(find_method_calls(e))
+  function check_method_calls(f::Function)
+    calls = String[]
+    for e in code_typed(f)
+      append!(calls, check_method_calls(e))
+    end
+    (f,calls)
+  end
   
   function check_methods_exist(arr)
     lines = ASCIIString[""]
@@ -190,7 +198,7 @@ module TypeCheck
     for b in bod
       if typeof(b) == Expr
         if b.head == :return
-          append!(body,b.args)
+          append!(bod,b.args)
         elseif b.head == :call
           push!(lines,b.args)
         end 
