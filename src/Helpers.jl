@@ -1,12 +1,4 @@
-Types = Union(DataType,UnionType,TypeVar,TypeConstructor,())
-AtomicType = Union(Types,(Types,))
-AType = Union(AtomicType,(AtomicType,),
-              (AtomicType,AtomicType),
-              (AtomicType,AtomicType,AtomicType),
-              (AtomicType,AtomicType,AtomicType,AtomicType),
-              (AtomicType,AtomicType,AtomicType,AtomicType,AtomicType),
-              (AtomicType,AtomicType,AtomicType,AtomicType,AtomicType,AtomicType),
-              (AtomicType,AtomicType,AtomicType,AtomicType,AtomicType,AtomicType,AtomicType))
+AType = Union(Type,TypeVar)
 
 istype(t::DataType) = true
 istype(t::UnionType) = true
