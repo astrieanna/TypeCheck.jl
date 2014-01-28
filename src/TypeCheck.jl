@@ -42,8 +42,11 @@ module TypeCheck
   check_return_values(m::Module;kwargs...) = check_all_module(m;test=check_return_values,kwargs...)
 
   function check_return_values(f::Function;kwargs...)
-    results = [check_return_value(e;kwargs...) for e in code_typed(f)]
-    results = [r[1] for r in filter(x-> x[2], results)]
+    results = MethodSignature[]
+    for e in code_typed(f)
+      (ms,b) = check_return_value(e;kwargs...)
+      if b push!(results,ms) end
+    end
     FunctionSignature(results,f.env.name)
   end
 
