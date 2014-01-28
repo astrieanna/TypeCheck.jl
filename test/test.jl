@@ -35,5 +35,20 @@ module TestTypeCheck
     check_return(foo, notcaught)
   end
 
+  facts("Check Loop Types: Make Sure It Runs on Base") do
+    for n in names(Base)
+      if isdefined(Base,n)
+        f = eval(Base,n)
+        if isgeneric(f) && typeof(f) == Function
+          context(string(n)) do
+            @fact TypeCheck.check_loop_types(f) => anything #=> LoopResults
+          end
+        end
+      else
+        @fact n => x->isdefined(Base,x)
+      end
+    end
+  end
+
   exitstatus()
 end
