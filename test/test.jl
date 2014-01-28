@@ -18,16 +18,21 @@ module TestTypeCheck
     end
   end
 
+  caught(x) = x[2] == true
+  notcaught(x) = x[2] == false
+  function check_return(f,check)
+    @fact length(code_typed(f)) => 1
+    @fact TypeCheck.check_return_value(code_typed(f)[1]) => check
+  end
+
   facts("Check Return Types: True Positives") do
     barr(x::Int) = isprime(x) ? x : false
-    @fact length(code_typed(barr)) => 1
-    @fact TypeCheck.check_return_value(code_typed(barr)[1]) => x -> x[2] == true
+    check_return(barr, caught)
   end
 
   facts("Check Return Types: False Negatives") do
     foo(x::Any) = isprime(x) ? x : false
-    @fact length(code_typed(foo)) => 1
-    @fact TypeCheck.check_return_value(code_typed(foo)[1]) => x -> x[2] == false
+    check_return(foo, notcaught)
   end
 
   exitstatus()
