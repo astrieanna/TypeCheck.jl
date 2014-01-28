@@ -1,38 +1,23 @@
 # These are some functions to allow static type-checking of Julia programs
 
 module TypeCheck
-  export check_all_module, check_function, check_loop_types, check_return_value
+  export check_all_module, check_loop_types, check_return_value
 
   include("Helpers.jl")
 
-  # check all the methods of a generic function
-  function _check_function(f;foo=check_return_value,kwargs...) #f should be a generic function
-    results = [foo(e;kwargs...) for e in code_typed(f)]
-    results = [r[1] for r in filter(x-> x[2], results)]
-    (FunctionSignature(results,f.env.name),length(results))
-  end
-
-  function check_function(f;kwargs...)
-    (results,count) = _check_function(f;kwargs...)
-    results
-  end
-  
   # check all the generic functions in a module
-  function check_all_module(m::Module;kwargs...)
+  function check_all_module(m::Module;test=check_return_value,kwargs...)
     score = 0
     for n in names(m)
       f = eval(m,n)
       if isgeneric(f) && typeof(f) == Function
-        fm = _check_function(f;kwargs...)
+        fm = test(f;kwargs...)
         score += length(fm.methods)
         display(fm)
       end
     end
     println("The total number of failed methods in $m is $score")
   end
-
-
-## Checking that return values are base only on input *types*, not values.
 
   type MethodSignature
     typs::Vector{AType}
@@ -50,6 +35,16 @@ module TypeCheck
       print(io,string(x.name))
       display(m)
     end
+  end
+
+## Checking that return values are base only on input *types*, not values.
+
+  check_return_values(m::Module;kwargs...) = check_all_module(m;test=check_return_values,kwargs...)
+
+  function check_return_values(f::Function;kwargs...)
+    results = [check_return_value(e;kwargs...) for e in code_typed(f)]
+    results = [r[1] for r in filter(x-> x[2], results)]
+    FunctionSignature(results,f.env.name)
   end
 
   function check_return_value(e::Expr;kwargs...)
@@ -98,33 +93,24 @@ module TypeCheck
     b = body(e)
     loops = Int[]
     nesting = 0
-    lines = {}
+    lines = Union(Expr,LabelNode)[] 
     for i in 1:length(b)
       if typeof(b[i]) == LabelNode
         l = b[i].label
         jumpback = findnext(x-> typeof(x) == GotoNode && x.label == l, b, i)
         if jumpback != 0
-          #println("$i: START LOOP: ends at $jumpback")
           push!(loops,jumpback)
           nesting += 1
         end
       end
 
       if nesting > 0
-        #if typeof(b[i]) == Expr
-        #  println("$i: \t", b[i])
-        #elseif typeof(b[i]) == LabelNode || typeof(b[i]) == GotoNode
-        #  println("$i: ", typeof(b[i]), " ", b[i].label)
-        #elseif typeof(b[i]) != LineNumberNode
-        #  println("$i: ", typeof(b[i]))
-        #end
         push!(lines,(i,b[i]))
       end
 
       if typeof(b[i]) == GotoNode && in(i,loops)
         splice!(loops,findfirst(loops,i))
         nesting -= 1
-        #println("$i: END LOOP: jumps to ",b[i].label)
       end
     end
     lines

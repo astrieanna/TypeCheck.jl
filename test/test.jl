@@ -7,7 +7,7 @@ module TestTypeCheck
         f = eval(Base,n)
         if isgeneric(f) && typeof(f) == Function
           context(string(n)) do
-            @fact TypeCheck._check_function(f) => anything #=> ([],0)
+            @fact TypeCheck.check_return_values(f) => anything #=> FunctionSignature([],Symbol)
             [@fact TypeCheck.istype(TypeCheck.returntype(e)) => true for e in code_typed(f)]
             [@fact TypeCheck.returntype(e) => TypeCheck.istype for e in code_typed(f)]
           end
