@@ -137,7 +137,7 @@ module TypeCheck
         end                          
       end
     end
-    return isempty(lines) ? lines : unshift!(lines,"")
+    return isempty(lines) ? (lines,false) : (unshift!(lines,""),true)
   end
 
 ## Check method calls
