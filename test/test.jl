@@ -1,7 +1,7 @@
 module TestTypeCheck
   using TypeCheck, FactCheck
   
-  facts("Check Return Types") do
+  facts("Check Return Types: Make Sure It Runs on Base") do
     for n in names(Base)
       if isdefined(Base,n)
         f = eval(Base,n)
@@ -16,6 +16,18 @@ module TestTypeCheck
         @fact n => x->isdefined(Base,x)
       end
     end
+  end
+
+  facts("Check Return Types: True Positives") do
+    barr(x::Int) = isprime(x) ? x : false
+    @fact length(code_typed(barr)) => 1
+    @fact TypeCheck.check_return_value(code_typed(barr)[1]) => x -> x[2] == true
+  end
+
+  facts("Check Return Types: False Negatives") do
+    foo(x::Any) = isprime(x) ? x : false
+    @fact length(code_typed(foo)) => 1
+    @fact TypeCheck.check_return_value(code_typed(foo)[1]) => x -> x[2] == false
   end
 
   exitstatus()
