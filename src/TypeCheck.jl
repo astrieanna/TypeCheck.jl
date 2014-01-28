@@ -21,7 +21,7 @@ module TypeCheck
 
   type MethodSignature
     typs::Vector{AType}
-    returntype::Type
+    returntype::Union(Type,TypeVar) # v0.2 has TypeVars as returntypes; v0.3 does not
   end
   MethodSignature(e::Expr) = MethodSignature(argtypes(e),returntype(e))
 
