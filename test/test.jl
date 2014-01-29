@@ -51,6 +51,13 @@ module TestTypeCheck
     end
   end
 
+  passed(x) = isempty(x.methods)
+  failed(x) = !passed(x)
+  function check_loops(f,check)
+    @fact length(code_typed(f)) => 1
+    @fact check_loop_types(f) => check
+  end
+
   facts("Check Loop Types: True Positives") do
     function f1(x::Int)
       for n in 1:x
@@ -58,11 +65,27 @@ module TestTypeCheck
       end
       return x
     end
-    @fact length(code_typed(f1)) => 1
-    @fact check_loop_types(f1).methods => not(isempty)
+    check_loops(f1,failed)
   end
 
-  facts("Check Loop Types: False Negatives") do
+  facts("Check Loop Types: True Negatives") do
+    function g1()
+      x::Int = 5
+      for i = 1:100
+        x *= 2.5
+      end
+      return x
+    end
+    check_loops(g1,passed)
+    function g2()
+      x = 5
+      x = 0.2
+      for i = 1:10
+        x *= 2
+      end
+      return x
+    end
+    check_loops(g2,passed)
   end
 
 
