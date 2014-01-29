@@ -24,21 +24,21 @@ module TypeCheck
     returntype::Union(Type,TypeVar) # v0.2 has TypeVars as returntypes; v0.3 does not
   end
   MethodSignature(e::Expr) = MethodSignature(argtypes(e),returntype(e))
+  Base.writemime(io, ::MIME"text/plain", x::MethodSignature) = println(io,"(",string_of_argtypes(x.typs),")::",x.returntype)
+
+## Checking that return values are base only on input *types*, not values.
 
   type FunctionSignature
     methods::Vector{MethodSignature}
     name::Symbol
   end
 
-  Base.writemime(io, ::MIME"text/plain", x::MethodSignature) = println(io,"(",string_of_argtypes(x.typs),")::",x.returntype)
   function Base.writemime(io, ::MIME"text/plain", x::FunctionSignature)
     for m in x.methods
       print(io,string(x.name))
       display(m)
     end
   end
-
-## Checking that return values are base only on input *types*, not values.
 
   check_return_values(m::Module;kwargs...) = check_all_module(m;test=check_return_values,kwargs...)
 
