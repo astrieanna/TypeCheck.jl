@@ -52,6 +52,14 @@ module TestTypeCheck
   end
 
   facts("Check Loop Types: True Positives") do
+    function f1(x::Int)
+      for n in 1:x
+        x /= n
+      end
+      return x
+    end
+    @fact length(code_typed(f1)) => 1
+    @fact check_loop_types(f1).methods => not(isempty)
   end
 
   facts("Check Loop Types: False Negatives") do
