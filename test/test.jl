@@ -7,7 +7,7 @@ module TestTypeCheck
         f = eval(Base,n)
         if isgeneric(f) && typeof(f) == Function
           context(string(n)) do
-            @fact TypeCheck.check_return_values(f) => anything #=> FunctionSignature([],Symbol)
+            @fact TypeCheck.check_return_types(f) => anything #=> FunctionSignature([],Symbol)
             [@fact TypeCheck.istype(TypeCheck.returntype(e)) => true for e in code_typed(f)]
             [@fact TypeCheck.returntype(e) => TypeCheck.istype for e in code_typed(f)]
           end
@@ -22,7 +22,7 @@ module TestTypeCheck
   notcaught(x) = x[2] == false
   function check_return(f,check)
     @fact length(code_typed(f)) => 1
-    @fact TypeCheck.check_return_value(code_typed(f)[1]) => check
+    @fact TypeCheck.check_return_type(code_typed(f)[1]) => check
   end
 
   facts("Check Return Types: True Positives") do

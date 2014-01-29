@@ -1,12 +1,12 @@
 # These are some functions to allow static type-checking of Julia programs
 
 module TypeCheck
-  export check_return_values, check_loop_types, check_method_calls
+  export check_return_types, check_loop_types, check_method_calls
 
   include("Helpers.jl")
 
   # check all the generic functions in a module
-  function check_all_module(m::Module;test=check_return_value,kwargs...)
+  function check_all_module(m::Module;test=check_return_types,kwargs...)
     score = 0
     for n in names(m)
       f = eval(m,n)
@@ -40,18 +40,18 @@ module TypeCheck
     end
   end
 
-  check_return_values(m::Module;kwargs...) = check_all_module(m;test=check_return_values,kwargs...)
+  check_return_types(m::Module;kwargs...) = check_all_module(m;test=check_return_types,kwargs...)
 
-  function check_return_values(f::Function;kwargs...)
+  function check_return_types(f::Function;kwargs...)
     results = MethodSignature[]
     for e in code_typed(f)
-      (ms,b) = check_return_value(e;kwargs...)
+      (ms,b) = check_return_type(e;kwargs...)
       if b push!(results,ms) end
     end
     FunctionSignature(results,f.env.name)
   end
 
-  function check_return_value(e::Expr;kwargs...)
+  function check_return_type(e::Expr;kwargs...)
     (typ,b) = returnbasedonvalues(e;kwargs...)
     (MethodSignature(argtypes(e),typ),b)
   end
