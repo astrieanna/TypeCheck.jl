@@ -174,34 +174,84 @@ module TypeCheck
 
 ## Check method calls
 
-  check_method_calls(m::Module) = check_all_module(m;test=check_method_calls)
-  check_method_calls(e::Expr) = check_methods_exist(find_method_calls(e))
-  function check_method_calls(f::Function)
-    calls = String[]
-    for e in code_typed(f)
-      append!(calls, check_method_calls(e))
-    end
-    (f,calls)
+  type CallSignature
+    name::Symbol
+    argtypes::Vector{AType}
   end
-  
-  function check_methods_exist(arr)
-    lines = ASCIIString[""]
-    for e in arr
-      append!(lines,["\t\t$s" for s in split("$e",['\n'])])
-    end
-    lines
+  Base.writemime(io, ::MIME"text/plain", x::CallSignature) = println(io,string(x.name),"(",string_of_argtypes(x.argtypes),")")
+
+  type MethodCalls
+    m::MethodSignature
+    calls::Vector{CallSignature}
   end
 
-  function find_method_calls(e)
-    bod = body(e)
-    lines = {}
-    for b in bod
-      if typeof(b) == Expr
-        if b.head == :return
-          append!(bod,b.args)
-        elseif b.head == :call
-          push!(lines,b.args)
-        end 
+  function Base.writemime(io, ::MIME"text/plain", x::MethodCalls)
+    display(x.m)
+    for c in x.calls
+      print(io,"\t")
+      display(c)
+    end
+  end
+
+  type FunctionCalls
+    name::Symbol
+    methods::Vector{MethodCalls}
+  end
+
+  function Base.writemime(io, ::MIME"text/plain", x::FunctionCalls)
+    for mc in x.methods
+      print(io,string(x.name))
+      display(mc)
+    end
+  end
+
+  check_method_calls(m::Module) = check_all_module(m;test=check_method_calls)
+  check_method_calls(e::Expr) = find_no_method_errors(e,find_method_calls(e))
+  function check_method_calls(f::Function)
+    calls = MethodCalls[] 
+    for e in code_typed(f)
+      mc = check_method_calls(e)
+      if !isempty(mc.calls)
+        push!(calls, mc)
+      end
+    end
+    FunctionCalls(f.env.name,calls)
+  end
+
+  function check(cs::CallSignature;mod=Base)
+    if isdefined(mod,cs.name)
+      f = eval(mod,cs.name)
+      if isgeneric(f)
+        opts = methods(f,tuple(cs.argtypes...))
+        if isempty(opts) return cs end
+      end
+    else
+     # println("$mod.$(cs.name) is undefined")
+    end
+    return nothing
+  end
+ 
+  function find_no_method_errors(e::Expr,cs::Vector{CallSignature})
+    output = CallSignature[]
+    for callsig in cs
+      r = check(callsig)
+      if r != nothing push!(output,r) end
+    end
+    MethodCalls(MethodSignature(e),output)
+  end
+
+  function find_method_calls(e::Expr)
+    b = body(e)
+    lines = CallSignature[]
+    for s in b
+      if typeof(s) == Expr
+        if s.head == :return
+          append!(b, s.args)
+        elseif s.head == :call
+          if typeof(s.args[1]) == Symbol
+            push!(lines,CallSignature(s.args[1], [expr_type(e1) for e1 in s.args[2:end]]))
+          end
+        end
       end
     end
     lines

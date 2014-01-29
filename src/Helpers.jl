@@ -68,10 +68,10 @@ end
 expr_type(s::Symbol) = Any
 expr_type(s::SymbolNode) = Any
 expr_type(t::TopNode) = Any
-expr_type(l::LambdaStaticData) = error("Got LambdaStaticData; you should have pulled the type from the surrounding Expr.")
+expr_type(l::LambdaStaticData) = Function
 expr_type(e) = typeof(e)
 
-expr_type(q::QuoteNode) = typeof(@show q)
+expr_type(q::QuoteNode) = expr_type(q.value)
 
 is_top(e) = Base.is_expr(e,:call) && typeof(e.args[1]) == TopNode
 
@@ -79,7 +79,7 @@ function expr_type(expr::Expr)
   if is_top(expr)
     return expr.typ 
   elseif Base.is_expr(expr,:call)
-    if typeof(expr.args[1]) == Expr && is_top(expr.args[1])
+    if is_top(expr.args[1])
       return expr_type(expr.args[1])
     elseif typeof(expr.args[1]) == SymbolNode # (func::F) -- non-generic function
       return Any
@@ -103,10 +103,19 @@ function expr_type(expr::Expr)
       us = Union([returntype(e2) for e2 in code_typed(f,fargtypes)]...)
       return us
     end
+    return expr.typ == Any ? @show(expr.typ) : expr.typ
+  elseif Base.is_expr(expr,:new)
+    return expr.typ
+  elseif Base.is_expr(expr,:call1)
+    if isa(expr.args[1],TopNode)
+      return expr.typ
+    end
+    println("###call1")
+    @show expr.args 
     @show expr.typ
-    return None 
+    return None
   else
-    @show typeof(expr)
+    @show (typeof(expr),expr.head)
     return None 
   end
 end
