@@ -35,6 +35,7 @@ module TestTypeCheck
     check_return(foo, notcaught)
   end
 
+
   facts("Check Loop Types: Make Sure It Runs on Base") do
     for n in names(Base)
       if isdefined(Base,n)
@@ -48,6 +49,34 @@ module TestTypeCheck
         @fact n => x->isdefined(Base,x)
       end
     end
+  end
+
+  facts("Check Loop Types: True Positives") do
+  end
+
+  facts("Check Loop Types: False Negatives") do
+  end
+
+
+  facts("Check Method Calls: Make Sure It Runs on Base") do
+    for n in names(Base)
+      if isdefined(Base,n)
+        f = eval(Base,n)
+        if isgeneric(f) && typeof(f) == Function
+          context(string(n)) do
+            @fact TypeCheck.check_method_calls(f) => anything #=> FunctionCalls
+          end
+        end
+      else
+        @fact n => x->isdefined(Base,x)
+      end
+    end
+  end
+
+  facts("Check Method Calls: True Positives") do
+  end
+
+  facts("Check Method Calls: False Negatives") do
   end
 
   exitstatus()
