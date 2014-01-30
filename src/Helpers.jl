@@ -64,59 +64,57 @@ function string_of_argtypes(arr::Vector{AType})
   join([string(a) for a in arr],",")
 end
 
-# Given an expression, return it's type when used in a method call
-expr_type(s::Symbol) = Any
-expr_type(s::SymbolNode) = Any
-expr_type(t::TopNode) = Any
-expr_type(l::LambdaStaticData) = Function
-expr_type(e) = typeof(e)
-
-expr_type(q::QuoteNode) = expr_type(q.value)
-
 is_top(e) = Base.is_expr(e,:call) && typeof(e.args[1]) == TopNode
+function find_returntype(e::Expr) #must be :call,:new,:call1
+  if Base.is_expr(e,:new); return e.typ; end
+  if Base.is_expr(e,:call1) && isa(e.args[1], TopNode); return e.typ; end
+  if !Base.is_expr(e,:call); error("Expected :call Expr"); end
 
-function expr_type(expr::Expr)
-  if is_top(expr)
-    return expr.typ 
-  elseif Base.is_expr(expr,:call)
-    if is_top(expr.args[1])
-      return expr_type(expr.args[1])
-    elseif typeof(expr.args[1]) == SymbolNode # (func::F) -- non-generic function
-      return Any
-    elseif typeof(expr.args[1]) == Symbol
-      if expr.typ != Any
-        return expr.typ
-      elseif LambdaStaticData in [typeof(x) for x in expr.args[2:end]]
-        return expr.typ
-      end
-
-      local f
-      try
-        f = eval(Base,expr.args[1]) #TODO: don't use Base here
-      catch e
-        return expr.typ # symbol not defined errors
-      end
-      if typeof(f) != Function || !isgeneric(f)
-        return expr.typ 
-      end
-      fargtypes = tuple([expr_type(e) for e in expr.args[2:end]]...)
-      us = Union([returntype(e2) for e2 in code_typed(f,fargtypes)]...)
-      return us
-    end
-    return expr.typ == Any ? @show(expr.typ) : expr.typ
-  elseif Base.is_expr(expr,:new)
-    return expr.typ
-  elseif Base.is_expr(expr,:call1)
-    if isa(expr.args[1],TopNode)
-      return expr.typ
-    end
-    println("###call1")
-    @show expr.args 
-    @show expr.typ
-    return None
-  else
-    @show (typeof(expr),expr.head)
-    return None 
+  if is_top(e)
+    return e.typ
   end
+
+  callee = e.args[1]
+  if is_top(callee)
+    return find_returntype(callee)
+  elseif isa(callee,SymbolNode) # only seen (func::F), so non-generic function
+    return Any
+  elseif is(callee,Symbol)
+    if e.typ != Any || any([isa(x,LambdaStaticData) for x in e.args[2:end]])
+      return e.typ
+    end
+
+    if isdefined(Base,callee)
+      f = eval(Base,callee)
+      if !isa(f,Function) || !isgeneric(f)
+        return e.typ
+      end
+      fargtypes = tuple([find_argtype(ea) for ea in e.args[2:end]])
+      return Union([returntype(ef) for ef in code_typed(f,fargtypes)]...)
+    else
+      return e.typ
+    end
+  end
+
+  return e.typ
 end
 
+function find_argtype(e::Expr)
+ if Base.is_expr(e,:call) || Base.is_expr(e,:new) || Base.is_expr(e,:call1)
+   return find_returntype(e)
+ end
+
+ @show e
+ return Any
+end
+find_argtype(s::Symbol) = Any #TODO: try looking up symbols
+find_argtype(s::SymbolNode) = Any
+find_argtype(t::TopNode) = Any
+find_argtype(l::LambdaStaticData) = Function
+find_argtype(q::QuoteNode) = find_argtype(q.value)
+
+#TODO: how to deal with immediate values
+find_argtype(e::Number) = typeof(e)
+find_argtype(e::Char) = typeof(e)
+find_argtype(e::String) = typeof(e)
+find_argtype(i) = typeof(i)
