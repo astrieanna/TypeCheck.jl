@@ -56,8 +56,7 @@ module TypeCheck
     (MethodSignature(argtypes(e),typ),b)
   end
   
-  # The goal of this function is, given one method of a generic function,
-  # determine whether it's return type might change based on input values rather than input types
+  # Determine whether this method's return type might change based on input values rather than input types
   function returnbasedonvalues(e::Expr;mod=Base,istrunion=false,ibytestring=false)
     rt = returntype(e)
     ts = argtypes(e)
@@ -82,16 +81,12 @@ module TypeCheck
     #@show cs
     return (rt,true) # return is not concrete type; all args are concrete types
   end
-    # what about functions that return an abstract type for other reasons? (bytestring)
-    # what about functions that are just not type-inferred well enough?
-    # if a function takes no arguments, should we return true or false?
 
-
-## Checking that variables in loops have concrete types that do not vary
+## Checking that variables in loops have concrete types
   
   type LoopResult
     msig::MethodSignature
-    lines::Vector{(Symbol,Type)}
+    lines::Vector{(Symbol,Type)} #TODO should this be a specialized type? SymbolNode?
     LoopResult(ms::MethodSignature,ls::Vector{(Symbol,Type)}) = new(ms,unique(ls))
   end
 
@@ -115,7 +110,7 @@ module TypeCheck
   end
 
   check_loop_types(m::Module) = check_all_module(m;test=check_loop_types)
-  check_loop_types(e::Expr;kwargs...) = find_loose_types(e,loopcontents(e))
+
   function check_loop_types(f::Function;kwargs...)
     lrs = LoopResult[]
     for e in code_typed(f)
@@ -124,9 +119,11 @@ module TypeCheck
     end
     LoopResults(f.env.name,lrs)
   end
+
+  check_loop_types(e::Expr;kwargs...) = find_loose_types(e,loopcontents(e))
   
   # This is a function for trying to detect loops in a method of a generic function
-  # And returns the lines that are inside one or more loops
+  # Returns lines that are inside one or more loops
   function loopcontents(e)
     b = body(e)
     loops = Int[]
@@ -154,6 +151,7 @@ module TypeCheck
     lines
   end
 
+  # Looks for variables with non-leaf types
   function find_loose_types(method::Expr,lr::Vector)
     lines = (Symbol,Type)[]
     for (i,e) in lr
@@ -206,7 +204,7 @@ module TypeCheck
   end
 
   check_method_calls(m::Module) = check_all_module(m;test=check_method_calls)
-  check_method_calls(e::Expr;kwargs...) = find_no_method_errors(e,find_method_calls(e);kwargs...)
+
   function check_method_calls(f::Function;kwargs...)
     calls = MethodCalls[] 
     for e in code_typed(f)
@@ -218,6 +216,9 @@ module TypeCheck
     FunctionCalls(f.env.name,calls)
   end
 
+  check_method_calls(e::Expr;kwargs...) = find_no_method_errors(e,find_method_calls(e);kwargs...)
+
+  # Find any methods that match the given CallSignature
   function check(mod::Module,cs::CallSignature)
     if isdefined(mod,cs.name)
       f = eval(mod,cs.name)
@@ -230,7 +231,8 @@ module TypeCheck
     end
     return nothing
   end
- 
+
+  # Find any CallSignatures that indicate potential NoMethodErrors 
   function find_no_method_errors(e::Expr,cs::Vector{CallSignature};mod=Base)
     output = CallSignature[]
     for callsig in cs
@@ -240,6 +242,7 @@ module TypeCheck
     MethodCalls(MethodSignature(e),output)
   end
 
+  # Look through the body of the function for `:call`s
   function find_method_calls(e::Expr)
     b = body(e)
     lines = CallSignature[]
