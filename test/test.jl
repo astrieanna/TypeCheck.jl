@@ -1,6 +1,8 @@
 module TestTypeCheck
   using TypeCheck, FactCheck
-  
+ 
+  istype(t) = isa(t,TypeCheck.AType)
+ 
   facts("Check Return Types: Make Sure It Runs on Base") do
     for n in names(Base)
       if isdefined(Base,n)
@@ -8,8 +10,8 @@ module TestTypeCheck
         if isgeneric(f) && typeof(f) == Function
           context(string(n)) do
             @fact TypeCheck.check_return_types(f) => anything #=> FunctionSignature([],Symbol)
-            [@fact TypeCheck.istype(TypeCheck.returntype(e)) => true for e in code_typed(f)]
-            [@fact TypeCheck.returntype(e) => TypeCheck.istype for e in code_typed(f)]
+            [@fact istype(TypeCheck.returntype(e)) => true for e in code_typed(f)]
+            [@fact TypeCheck.returntype(e) => istype for e in code_typed(f)]
           end
         end
       else

@@ -1,22 +1,5 @@
 AType = Union(Type,TypeVar)
 
-istype(t::DataType) = true
-istype(t::UnionType) = true
-istype(t::TypeVar) = true
-istype(t::TypeConstructor) = true
-istype(x::(Any,)) = istype(x[1])
-istype(x::(Any,Any)) = istype(x[1]) && istype(x[2])
-function istype(t) 
-  if Base.isType(t) 
-    return true
-  elseif length(t) == 1
-    return false
-  elseif tuple(t...) == t
-    return all(map(istype,t))
-  end
-  return false
-end
-
 function _whos(e::Expr)
   vars = sort(e.args[2][2];by=x->x[1])
   [println("\t",x[1],"\t",x[2]) for x in vars]
