@@ -53,7 +53,7 @@ function foo()
 end
 ~~~
 
-and correctly not complain about:
+It will correctly not complain about:
 ~~~
 function foo()
   x::Int = 4
@@ -64,6 +64,18 @@ function foo()
   end
 end
 ~~~
+and
+~~~
+function barr()
+  x::Int = 5
+  for i = 1:100
+    x *= 2.5
+  end
+  return x
+end
+~~~
+(the above function will throw an error rather than actually making `x` a `Float64`.)
+
 
 It is possible that it misses lose types in some cases, but I am not currently aware of them. Please let me know if you find one.
 
