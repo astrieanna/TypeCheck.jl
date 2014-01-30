@@ -1,4 +1,7 @@
-AType = Union(Type,TypeVar)
+function Base.code_typed(f::Function)
+  lengths = Set(Int64[length(m.sig) for m in f.env]...)
+  vcat([code_typed(f, tuple([Any for x in 1:l]...)) for l in lengths]...)
+end
 
 function _whos(e::Expr)
   vars = sort(e.args[2][2];by=x->x[1])
@@ -13,28 +16,23 @@ function Base.whos(f,args...)
   end
 end
 
+returntype(e::Expr) =  e.args[3].typ
+body(e::Expr) = e.args[3].args
+returns(e::Expr) = filter(x-> typeof(x) == Expr && x.head==:return,body(e))
+call_info(call::Expr) = (call.args[1], AType[expr_type(e) for e in call.args[2:end]])
+
 function signature(e::Expr)
   r = returntype(e) 
  "($(string_of_argtypes(argtypes(e))))::$(r)"
 end
-
-function Base.code_typed(f::Function)
-  lengths = Set(Int64[length(m.sig) for m in f.env]...)
-  vcat([code_typed(f, tuple([Any for x in 1:l]...)) for l in lengths]...)
-end
   
-returntype(e::Expr) =  e.args[3].typ
-body(e::Expr) = e.args[3].args
-returns(e::Expr) = filter(x-> typeof(x) == Expr && x.head==:return,body(e))
-
 function extract_calls_from_returns(e::Expr)
   rs = returns(e)
   rs_with_calls = filter(x->typeof(x.args[1]) == Expr && x.args[1].head == :call,rs)
   Expr[expr.args[1] for expr in rs_with_calls]
 end
 
-# get function name and the types of the arguments for a Expr with head :call
-call_info(call::Expr) = (call.args[1], AType[expr_type(e) for e in call.args[2:end]])
+AType = Union(Type,TypeVar)
 
 # for a function, get the types of each of the arguments in the signature
 function argtypes(e::Expr)
