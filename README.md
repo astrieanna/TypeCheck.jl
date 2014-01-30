@@ -20,12 +20,20 @@ It is only effective at catching functions with annotated argument types.
 
 It will catch things like:
 ~~~
-foo(x::Int) = isprime(x) ? x : false
+julia> foo1(x::Int) = isprime(x) ? x: false
+foo1 (generic function with 1 method)
+
+julia> check_return_types(foo1)
+foo1(Int64)::Union(Bool,Int64)
 ~~~
 
 However, it will not catch:
 ~~~
-foo(x) = isprime(x) ? x : false
+julia> foo2(x) = isprime(x) ? x : false
+foo2 (generic function with 1 method)
+
+julia> check_return_types(foo2)
+
 ~~~
 
 Additionally, it does a check to see if the return type of the function depends on a function call in the return statement.
@@ -44,37 +52,48 @@ You can run this on a generic function or on a module:
 
 It will complain about:
 ~~~
-function foo()
-  x=4
-  for i in 1:10
-    x *= 2.5
-  end
-  x
-end
+julia> function barr1()
+         x=4
+         for i in 1:10
+           x *= 2.5
+         end
+         x
+       end
+barr1 (generic function with 1 method)
+
+julia> check_loop_types(barr1)
+barr1()::Union(Float64,Int64)
+	x::Union(Float64,Int64)
 ~~~
 
 It will correctly not complain about:
 ~~~
-function foo()
-  x::Int = 4
-  x *= 2
-  x::Float64 = 4.3
-  for i=1:10
-   x *= 2.5
-  end
-end
+julia> function barr2()
+         x = 4
+         x = 2.5
+         for i=1:10
+           x *= 2.5
+         end
+       end
+barr2 (generic function with 1 method)
+
+julia> check_loop_types(barr2)
+
 ~~~
 and
 ~~~
-function barr()
-  x::Int = 5
-  for i = 1:100
-    x *= 2.5
-  end
-  return x
-end
+julia> function barr3()
+         x::Int = 4
+         for i=1:10
+           x *= 2.5
+         end       
+       end       
+barr3 (generic function with 1 method)
+
+julia> check_loop_types(barr3)
+
 ~~~
-(the above function will throw an error rather than actually making `x` a `Float64`.)
+(`barr3()` will throw an error rather than actually making `x` a `Float64`.)
 
 
 It is possible that it misses lose types in some cases, but I am not currently aware of them. Please let me know if you find one.
@@ -92,6 +111,23 @@ This functionality is still clearly imperfect. I'm working on refining it to be 
 ### More Helper Functions
 This package also defined `code_typed(f::Function)` to get the Expr for each method of a function
 and `whos(f::Function)` to get a listing of the names and types of all the variables in the function.
+
+`whos`'s output is modeled on the output of the existing methods in Base:
+~~~
+julia> function xyz(x::Int,y)
+         p = pi
+         z = x + y * pi
+       end
+xyz (generic function with 1 method)
+
+julia> whos(xyz)
+(Int64,Any)::Any
+	#s38	Any
+	p	MathConst{:π}
+	x	Int64
+	y	Any
+	z	Any
+~~~
 
 ### Other Ways to Run Checks
 If you want to run these only on a single method, you can get the `Expr` for the method from `code_typed` and then pass that into the check you would like to run.
