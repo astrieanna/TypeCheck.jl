@@ -92,7 +92,7 @@ function find_returntype(e::Expr) #must be :call,:new,:call1
       fargtypes = tuple([find_argtype(ea) for ea in e.args[2:end]])
       return Union([returntype(ef) for ef in code_typed(f,fargtypes)]...)
     else
-      return e.typ
+      return @show e.typ
     end
   end
 

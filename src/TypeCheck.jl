@@ -11,7 +11,7 @@ module TypeCheck
     for n in names(m)
       f = eval(m,n)
       if isgeneric(f) && typeof(f) == Function
-        fm = test(f;kwargs...)
+        fm = test(f;mod=m,kwargs...)
         score += length(fm.methods)
         display(fm)
       end
@@ -58,7 +58,7 @@ module TypeCheck
   
   # The goal of this function is, given one method of a generic function,
   # determine whether it's return type might change based on input values rather than input types
-  function returnbasedonvalues(e::Expr;istrunion=false,ibytestring=false)
+  function returnbasedonvalues(e::Expr;mod=Base,istrunion=false,ibytestring=false)
     rt = returntype(e)
     ts = argtypes(e)
 
@@ -115,8 +115,8 @@ module TypeCheck
   end
 
   check_loop_types(m::Module) = check_all_module(m;test=check_loop_types)
-  check_loop_types(e::Expr) = find_loose_types(e,loopcontents(e))
-  function check_loop_types(f::Function)
+  check_loop_types(e::Expr;kwargs...) = find_loose_types(e,loopcontents(e))
+  function check_loop_types(f::Function;kwargs...)
     lrs = LoopResult[]
     for e in code_typed(f)
       lr = check_loop_types(e)
@@ -206,11 +206,11 @@ module TypeCheck
   end
 
   check_method_calls(m::Module) = check_all_module(m;test=check_method_calls)
-  check_method_calls(e::Expr) = find_no_method_errors(e,find_method_calls(e))
-  function check_method_calls(f::Function)
+  check_method_calls(e::Expr;kwargs...) = find_no_method_errors(e,find_method_calls(e);kwargs...)
+  function check_method_calls(f::Function;kwargs...)
     calls = MethodCalls[] 
     for e in code_typed(f)
-      mc = check_method_calls(e)
+      mc = check_method_calls(e;kwargs...)
       if !isempty(mc.calls)
         push!(calls, mc)
       end
@@ -218,7 +218,7 @@ module TypeCheck
     FunctionCalls(f.env.name,calls)
   end
 
-  function check(cs::CallSignature;mod=Base)
+  function check(mod::Module,cs::CallSignature)
     if isdefined(mod,cs.name)
       f = eval(mod,cs.name)
       if isgeneric(f)
@@ -226,15 +226,15 @@ module TypeCheck
         if isempty(opts) return cs end
       end
     else
-     # println("$mod.$(cs.name) is undefined")
+      println("$mod.$(cs.name) is undefined")
     end
     return nothing
   end
  
-  function find_no_method_errors(e::Expr,cs::Vector{CallSignature})
+  function find_no_method_errors(e::Expr,cs::Vector{CallSignature};mod=Base)
     output = CallSignature[]
     for callsig in cs
-      r = check(callsig)
+      r = check(mod,callsig)
       if r != nothing push!(output,r) end
     end
     MethodCalls(MethodSignature(e),output)
