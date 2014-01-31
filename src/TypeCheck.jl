@@ -71,7 +71,7 @@ module TypeCheck
      end
     end
 
-    cs = [find_returntype(c) for c in extract_calls_from_returns(e)]
+    cs = [find_returntype(c,e) for c in extract_calls_from_returns(e)]
     for c in cs
       if rt == c
          return (rt,false)
@@ -252,7 +252,7 @@ module TypeCheck
           append!(b, s.args)
         elseif s.head == :call
           if typeof(s.args[1]) == Symbol
-            push!(lines,CallSignature(s.args[1], [find_argtype(e1) for e1 in s.args[2:end]]))
+            push!(lines,CallSignature(s.args[1], [find_argtype(e1,e) for e1 in s.args[2:end]]))
           end
         end
       end

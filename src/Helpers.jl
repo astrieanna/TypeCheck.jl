@@ -46,7 +46,7 @@ function string_of_argtypes(arr::Vector{AType})
 end
 
 is_top(e) = Base.is_expr(e,:call) && typeof(e.args[1]) == TopNode
-function find_returntype(e::Expr) #must be :call,:new,:call1
+function find_returntype(e::Expr,context::Expr) #must be :call,:new,:call1
   if Base.is_expr(e,:new); return e.typ; end
   if Base.is_expr(e,:call1) && isa(e.args[1], TopNode); return e.typ; end
   if !Base.is_expr(e,:call); error("Expected :call Expr"); end
@@ -57,7 +57,7 @@ function find_returntype(e::Expr) #must be :call,:new,:call1
 
   callee = e.args[1]
   if is_top(callee)
-    return find_returntype(callee)
+    return find_returntype(callee,context)
   elseif isa(callee,SymbolNode) # only seen (func::F), so non-generic function
     return Any
   elseif is(callee,Symbol)
@@ -70,7 +70,7 @@ function find_returntype(e::Expr) #must be :call,:new,:call1
       if !isa(f,Function) || !isgeneric(f)
         return e.typ
       end
-      fargtypes = tuple([find_argtype(ea) for ea in e.args[2:end]])
+      fargtypes = tuple([find_argtype(ea,context) for ea in e.args[2:end]])
       return Union([returntype(ef) for ef in code_typed(f,fargtypes)]...)
     else
       return @show e.typ
@@ -80,22 +80,25 @@ function find_returntype(e::Expr) #must be :call,:new,:call1
   return e.typ
 end
 
-function find_argtype(e::Expr)
+function find_argtype(e::Expr,context::Expr)
  if Base.is_expr(e,:call) || Base.is_expr(e,:new) || Base.is_expr(e,:call1)
-   return find_returntype(e)
+   return find_returntype(e,context)
  end
 
  @show e
  return Any
 end
-find_argtype(s::Symbol) = Any #TODO: try looking up symbols
-find_argtype(s::SymbolNode) = Any
-find_argtype(t::TopNode) = Any
-find_argtype(l::LambdaStaticData) = Function
-find_argtype(q::QuoteNode) = find_argtype(q.value)
+function find_argtype(s::Symbol,e::Expr)
+  vartypes = [x[1] => x[2] for x in e.args[2][2]]
+  s in vartypes ? (vartypes[@show s]) : Any
+end
+find_argtype(s::SymbolNode,e::Expr) = s.typ
+find_argtype(t::TopNode,e::Expr) = Any
+find_argtype(l::LambdaStaticData,e::Expr) = Function
+find_argtype(q::QuoteNode,e::Expr) = find_argtype(q.value,e)
 
 #TODO: how to deal with immediate values
-find_argtype(e::Number) = typeof(e)
-find_argtype(e::Char) = typeof(e)
-find_argtype(e::String) = typeof(e)
-find_argtype(i) = typeof(i)
+find_argtype(n::Number,e::Expr) = typeof(n)
+find_argtype(c::Char,e::Expr) = typeof(c)
+find_argtype(s::String,e::Expr) = typeof(s)
+find_argtype(i,e::Expr) = typeof(i)
