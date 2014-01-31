@@ -227,7 +227,7 @@ module TypeCheck
         if isempty(opts) return cs end
       end
     else
-      println("$mod.$(cs.name) is undefined")
+      #println("$mod.$(cs.name) is undefined")
     end
     return nothing
   end
