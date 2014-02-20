@@ -1,0 +1,7 @@
+6-element Array{Any,1}:
+ :(unless top(sle_int)(#s79::Int64,1000)::Bool goto 2)       
+ :(i = #s79::Int64)                                          
+ :(x = +(x::Union(Int64,Float64),100)::Union(Int64,Float64)) 
+ :(x = /(x::Union(Int64,Float64),2)::Float64)                
+ :(#s79 = top(box)(Int64,top(add_int)(1,#s79::Int64))::Int64)
+ :(goto 1)                                                   

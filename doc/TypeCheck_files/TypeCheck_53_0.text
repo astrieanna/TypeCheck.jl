@@ -1,0 +1,4 @@
+3-element Array{Type{T<:Top},1}:
+ Int64                    
+ String                   
+ Union(UTF8String,Float64)

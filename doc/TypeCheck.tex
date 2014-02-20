@@ -1,0 +1,2858 @@
+
+
+
+% Header, overrides base
+
+    % Make sure that the sphinx doc style knows who it inherits from.
+    \def\sphinxdocclass{article}
+
+    % Declare the document class
+    \documentclass[letterpaper,10pt,english]{/usr/share/sphinx/texinputs/sphinxhowto}
+
+    % Imports
+    \usepackage[utf8]{inputenc}
+    \DeclareUnicodeCharacter{00A0}{\\nobreakspace}
+    \usepackage[T1]{fontenc}
+    \usepackage{babel}
+    \usepackage{times}
+    \usepackage{import}
+    \usepackage[Bjarne]{/usr/share/sphinx/texinputs/fncychap}
+    \usepackage{longtable}
+    \usepackage{/usr/share/sphinx/texinputs/sphinx}
+    \usepackage{multirow}
+
+    \usepackage{amsmath}
+    \usepackage{amssymb}
+    \usepackage{ucs}
+    \usepackage{enumerate}
+
+    % Used to make the Input/Output rules follow around the contents.
+    \usepackage{needspace}
+
+    % Pygments requirements
+    \usepackage{fancyvrb}
+    \usepackage{color}
+    % ansi colors additions
+    \definecolor{darkgreen}{rgb}{.12,.54,.11}
+    \definecolor{lightgray}{gray}{.95}
+    \definecolor{brown}{rgb}{0.54,0.27,0.07}
+    \definecolor{purple}{rgb}{0.5,0.0,0.5}
+    \definecolor{darkgray}{gray}{0.25}
+    \definecolor{lightred}{rgb}{1.0,0.39,0.28}
+    \definecolor{lightgreen}{rgb}{0.48,0.99,0.0}
+    \definecolor{lightblue}{rgb}{0.53,0.81,0.92}
+    \definecolor{lightpurple}{rgb}{0.87,0.63,0.87}
+    \definecolor{lightcyan}{rgb}{0.5,1.0,0.83}
+
+    % Needed to box output/input
+    \usepackage{tikz}
+        \usetikzlibrary{calc,arrows,shadows}
+    \usepackage[framemethod=tikz]{mdframed}
+
+    \usepackage{alltt}
+
+    % Used to load and display graphics
+    \usepackage{graphicx}
+    \graphicspath{ {figs/} }
+    \usepackage[Export]{adjustbox} % To resize
+
+    % used so that images for notebooks which have spaces in the name can still be included
+    \usepackage{grffile}
+
+
+    % For formatting output while also word wrapping.
+    \usepackage{listings}
+    \lstset{breaklines=true}
+    \lstset{basicstyle=\small\ttfamily}
+    \def\smaller{\fontsize{9.5pt}{9.5pt}\selectfont}
+
+    %Pygments definitions
+    
+\makeatletter
+\def\PY@reset{\let\PY@it=\relax \let\PY@bf=\relax%
+    \let\PY@ul=\relax \let\PY@tc=\relax%
+    \let\PY@bc=\relax \let\PY@ff=\relax}
+\def\PY@tok#1{\csname PY@tok@#1\endcsname}
+\def\PY@toks#1+{\ifx\relax#1\empty\else%
+    \PY@tok{#1}\expandafter\PY@toks\fi}
+\def\PY@do#1{\PY@bc{\PY@tc{\PY@ul{%
+    \PY@it{\PY@bf{\PY@ff{#1}}}}}}}
+\def\PY#1#2{\PY@reset\PY@toks#1+\relax+\PY@do{#2}}
+
+\expandafter\def\csname PY@tok@gd\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.63,0.00,0.00}{##1}}}
+\expandafter\def\csname PY@tok@gu\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.50,0.00,0.50}{##1}}}
+\expandafter\def\csname PY@tok@gt\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.27,0.87}{##1}}}
+\expandafter\def\csname PY@tok@gs\endcsname{\let\PY@bf=\textbf}
+\expandafter\def\csname PY@tok@gr\endcsname{\def\PY@tc##1{\textcolor[rgb]{1.00,0.00,0.00}{##1}}}
+\expandafter\def\csname PY@tok@cm\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\expandafter\def\csname PY@tok@vg\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@m\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@mh\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@go\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.53,0.53,0.53}{##1}}}
+\expandafter\def\csname PY@tok@ge\endcsname{\let\PY@it=\textit}
+\expandafter\def\csname PY@tok@vc\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@il\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@cs\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\expandafter\def\csname PY@tok@cp\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.74,0.48,0.00}{##1}}}
+\expandafter\def\csname PY@tok@gi\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.63,0.00}{##1}}}
+\expandafter\def\csname PY@tok@gh\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\expandafter\def\csname PY@tok@ni\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.60,0.60,0.60}{##1}}}
+\expandafter\def\csname PY@tok@nl\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.63,0.63,0.00}{##1}}}
+\expandafter\def\csname PY@tok@nn\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\expandafter\def\csname PY@tok@no\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.53,0.00,0.00}{##1}}}
+\expandafter\def\csname PY@tok@na\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.49,0.56,0.16}{##1}}}
+\expandafter\def\csname PY@tok@nb\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@nc\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\expandafter\def\csname PY@tok@nd\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.67,0.13,1.00}{##1}}}
+\expandafter\def\csname PY@tok@ne\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.82,0.25,0.23}{##1}}}
+\expandafter\def\csname PY@tok@nf\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\expandafter\def\csname PY@tok@si\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.73,0.40,0.53}{##1}}}
+\expandafter\def\csname PY@tok@s2\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@vi\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@nt\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@nv\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@s1\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@sh\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@sc\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@sx\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@bp\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@c1\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\expandafter\def\csname PY@tok@kc\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@c\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\expandafter\def\csname PY@tok@mf\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@err\endcsname{\def\PY@bc##1{\setlength{\fboxsep}{0pt}\fcolorbox[rgb]{1.00,0.00,0.00}{1,1,1}{\strut ##1}}}
+\expandafter\def\csname PY@tok@kd\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@ss\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@sr\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.40,0.53}{##1}}}
+\expandafter\def\csname PY@tok@mo\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@kn\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@mi\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@gp\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\expandafter\def\csname PY@tok@o\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@kr\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@s\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@kp\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@w\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.73,0.73}{##1}}}
+\expandafter\def\csname PY@tok@kt\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.69,0.00,0.25}{##1}}}
+\expandafter\def\csname PY@tok@ow\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.67,0.13,1.00}{##1}}}
+\expandafter\def\csname PY@tok@sb\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@k\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@se\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.73,0.40,0.13}{##1}}}
+\expandafter\def\csname PY@tok@sd\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+
+\def\PYZbs{\char`\\}
+\def\PYZus{\char`\_}
+\def\PYZob{\char`\{}
+\def\PYZcb{\char`\}}
+\def\PYZca{\char`\^}
+\def\PYZam{\char`\&}
+\def\PYZlt{\char`\<}
+\def\PYZgt{\char`\>}
+\def\PYZsh{\char`\#}
+\def\PYZpc{\char`\%}
+\def\PYZdl{\char`\$}
+\def\PYZhy{\char`\-}
+\def\PYZsq{\char`\'}
+\def\PYZdq{\char`\"}
+\def\PYZti{\char`\~}
+% for compatibility with earlier versions
+\def\PYZat{@}
+\def\PYZlb{[}
+\def\PYZrb{]}
+\makeatother
+
+
+    %Set pygments styles if needed...
+    
+        \definecolor{nbframe-border}{rgb}{0.867,0.867,0.867}
+        \definecolor{nbframe-bg}{rgb}{0.969,0.969,0.969}
+        \definecolor{nbframe-in-prompt}{rgb}{0.0,0.0,0.502}
+        \definecolor{nbframe-out-prompt}{rgb}{0.545,0.0,0.0}
+
+        \newenvironment{ColorVerbatim}
+        {\begin{mdframed}[%
+            roundcorner=1.0pt, %
+            backgroundcolor=nbframe-bg, %
+            userdefinedwidth=1\linewidth, %
+            leftmargin=0.1\linewidth, %
+            innerleftmargin=0pt, %
+            innerrightmargin=0pt, %
+            linecolor=nbframe-border, %
+            linewidth=1pt, %
+            usetwoside=false, %
+            everyline=true, %
+            innerlinewidth=3pt, %
+            innerlinecolor=nbframe-bg, %
+            middlelinewidth=1pt, %
+            middlelinecolor=nbframe-bg, %
+            outerlinewidth=0.5pt, %
+            outerlinecolor=nbframe-border, %
+            needspace=0pt
+        ]}
+        {\end{mdframed}}
+        
+        \newenvironment{InvisibleVerbatim}
+        {\begin{mdframed}[leftmargin=0.1\linewidth,innerleftmargin=3pt,innerrightmargin=3pt, userdefinedwidth=1\linewidth, linewidth=0pt, linecolor=white, usetwoside=false]}
+        {\end{mdframed}}
+
+        \renewenvironment{Verbatim}[1][\unskip]
+        {\begin{alltt}\smaller}
+        {\end{alltt}}
+    
+
+    % Help prevent overflowing lines due to urls and other hard-to-break 
+    % entities.  This doesn't catch everything...
+    \sloppy
+
+    % Document level variables
+    \title{TypeCheck}
+    \date{February 19, 2014}
+    \release{}
+    \author{Unknown Author}
+    \renewcommand{\releasename}{}
+
+    % TODO: Add option for the user to specify a logo for his/her export.
+    \newcommand{\sphinxlogo}{}
+
+    % Make the index page of the document.
+    \makeindex
+
+    % Import sphinx document type specifics.
+     
+
+
+% Body
+
+    % Start of the document
+    \begin{document}
+
+        
+            \maketitle
+        
+
+        
+
+
+        
+        \part{A Summary of Julia}Julia is a new language designed for technical computing. It is as easy
+to use and general-purpose as Python, but designed for fast computation,
+low-level control, and easy to express math. Julia is high-performance,
+dynamically-typed, and JIT-compiled. It is not focused on new ideas, but
+on executing existing ideas well, with a focus on being practical and
+approachable. As a language, some of Julia's distinctive features
+include multiple dispatch, first-class types, and Lisp-style macros.\section{The Julia Type System}Every value in Julia has a type; variables contain values, but do not
+themselves have types. Types are arranged into a hierarchy of abstract
+and concrete types. Abstract types can have subtypes, but cannot be
+instantiated and do not have properties. Concrete types can be
+instantiated and have zero or more properties, but cannot have subtypes.
+Every type has a super type. At top of the hierarchy is the \texttt{Any}
+type; the super type of \texttt{Any} is \texttt{Any}.
+
+In Julia, types are first-class; types are of type DataType, which is
+itself of type DataType. Types are used for inference, optimization,
+dispatch, and documentation, but not for type checking. Because Julia
+still works (but more slowly) without any type inference, all of the
+type inference is implemented in the language.
+
+Types can also take parameters; these can be types or \texttt{Int}s. For
+example, \texttt{Array\{T,N\}} is parameterized by the element type and
+the number of dimensions. Instances of the same type (such as
+\texttt{Array}) with different type parameters (say
+\texttt{Array\{Int,6\}} and \texttt{Array\{Number,4\}}) are never
+subtypes of one another.To define a type, you use the \texttt{type} keyword:
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}1{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n+nb}{type} \PY{n}{Point}\PY{p}{\PYZob{}}\PY{n}{T} \PY{o}{\PYZlt{}}\PY{p}{:} \PY{n}{Number}\PY{p}{\PYZcb{}}
+    \PY{n}{x}\PY{p}{:}\PY{p}{:}\PY{n}{T}
+    \PY{n}{y}\PY{p}{:}\PY{p}{:}\PY{n}{T}
+\PY{n}{end}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+The Point\{T\} type will have two properties, \texttt{x} and \texttt{y}.
+For any \texttt{Point}, the two properties will share a type, and their
+type will be a subtype of \texttt{Number}. From the definition, we also
+know that when a \texttt{Point} is represented in memory, \texttt{x}
+will precede \texttt{y}. Julia types are laid out in memory in a way
+compatible with C structs, which made implementing Julia's C calling
+functionality easier (and the result more efficient).\section{Introspection in Julia}Julia has admirable introspection and reflection abilities, which are
+very useful for writing static analysis. For any named function, you can
+get a type-inferred AST with a simple function call:
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}2{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{function} \PY{n}{foo}\PY{p}{(}\PY{n}{x}\PY{p}{:}\PY{p}{:}\PY{n}{Int}\PY{p}{)}
+    \PY{n}{z} \PY{o}{=} \PY{n}{x} \PY{o}{+} \PY{l+m+mi}{5}
+    \PY{k}{return} \PY{l+m+mi}{2} \PY{o}{*} \PY{n}{z}
+\PY{n}{end}
+
+\PY{n}{code\PYZus{}typed}\PY{p}{(}\PY{n}{foo}\PY{p}{,}\PY{p}{(}\PY{n}{Int}\PY{p}{,}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}2{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}1-element Array\{Any,1\}:
+ :(\$(Expr(:lambda, \{:x\}, \{\{:z\},\{\{:x,Int64,0\},\{:z,Int64,18\}\},\{\}\}, quote
+\# In[2], line 2:
+        z = top(box)(Int64,top(add\_int)(x::Int64,5))::Int64 \# line 3:
+        return top(box)(Int64,top(mul\_int)(2,z::Int64))::Int64
+    end)))\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+The \texttt{code\_typed} function takes a function and a method
+signature. Every named function is a generic function: it has one or
+more methods, each with their own type signature. Julia uses multiple
+dispatch, which means that it considers the type, number, and order of
+all the arguments to pick the best match to a call.
+
+\texttt{code\_typed} returns an untyped \texttt{Array} of
+\texttt{Expr}s, the type that represents a node of the Julia AST. For
+many invocations, this \texttt{Array} will only have one element. When
+the provided signature could match more than one existing method, all
+possible matches are returned. ``Possible'' matches occur when you pass
+an abstract type as part of the signature and some methods of the
+function accept subtypes of that type. The type of an actual value is
+always concrete, so the method that would actually get called would
+vary.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}3{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{e} \PY{o}{=} \PY{n}{code\PYZus{}typed}\PY{p}{(}\PY{n}{foo}\PY{p}{,}\PY{p}{(}\PY{n}{Int}\PY{p}{,}\PY{p}{)}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]} \PY{c}{\PYZsh{}Julia indexes from 1}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}3{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}:(\$(Expr(:lambda, \{:x\}, \{\{:z\},\{\{:x,Int64,0\},\{:z,Int64,18\}\},\{\}\}, quote
+\# In[2], line 2:
+        z = top(box)(Int64,top(add\_int)(x::Int64,5))::Int64 \# line 3:
+        return top(box)(Int64,top(mul\_int)(2,z::Int64))::Int64
+    end)))\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+An \texttt{Expr} has three fields: \texttt{head}, \texttt{args}, and
+\texttt{typ}.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}4{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{names}\PY{p}{(}\PY{n}{e}\PY{p}{)}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}4{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}3-element Array\{Symbol,1\}:
+ :head
+ :args
+ :typ\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+\begin{itemize}
+\item
+  \texttt{head} is a symbol indicating the type of expression. For
+  \texttt{Expr}s returned by \texttt{code\_typed}, this will be
+  \texttt{:lambda}. (In Julia, \texttt{:foo} is a way to write ``the
+  symbol \texttt{foo}''.)
+\item
+  \texttt{typ} is the return type of the method.
+\item
+  \texttt{args} is an \texttt{Array} of \texttt{Array}s. It contains
+  information about the variables (local, arguments, captured) and body
+  of the function. I'll explain more about the structure of
+  \texttt{args} as needed in the rest of this document.
+\end{itemize}\section{Helper Functions}While introspecting on functions is surprisingly easy, there is a lot of
+ugly code created by the unfortunate structure of the \texttt{Expr}
+type. As a result, I will start by describing a number of helper
+functions, which will give you a better idea of how it is structured.\subsection{A Function to Retrieve Return Types}\texttt{code\_typed} returns \texttt{Expr}s that have lots of type
+annotations, including the return type of the function. The outer
+\texttt{Expr} with \texttt{head} \texttt{:lambda} will have \texttt{typ}
+\texttt{Any}. The third element of \texttt{args} will be another
+\texttt{Expr} with \texttt{head} \texttt{:body}. The \texttt{typ}
+property of this Expr will be set to the inferred return type of the
+function. (There is currently no syntax in Julia to annotate function
+return types.)
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}5{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{code\PYZus{}typed}\PY{p}{(}\PY{n}{foo}\PY{p}{,}\PY{p}{(}\PY{n}{Int}\PY{p}{,}\PY{p}{)}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{o}{.}\PY{n}{args}\PY{p}{[}\PY{l+m+mi}{3}\PY{p}{]}\PY{o}{.}\PY{n}{typ}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}5{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}Int64\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+Because this is not especially readable, I wrote a helper function to
+pull out the return type:
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}6{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{returntype}\PY{p}{(}\PY{n}{e}\PY{p}{:}\PY{p}{:}\PY{n}{Expr}\PY{p}{)} \PY{o}{=}  \PY{n}{e}\PY{o}{.}\PY{n}{args}\PY{p}{[}\PY{l+m+mi}{3}\PY{p}{]}\PY{o}{.}\PY{n}{typ}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}6{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}returntype (generic function with 1 method)\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+\subsubsection{Usage examples:}For a call to \texttt{code\_typed} that we know will have one method
+returned:
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}7{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{returntype}\PY{p}{(}\PY{n}{code\PYZus{}typed}\PY{p}{(}\PY{n}{foo}\PY{p}{,}\PY{p}{(}\PY{n}{Int}\PY{p}{,}\PY{p}{)}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}7{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}Int64\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+For calls that might have more than one result:
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}8{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{Type}\PY{p}{[}\PY{n}{returntype}\PY{p}{(}\PY{n}{t}\PY{p}{)} \PY{k}{for} \PY{n}{t} \PY{o+ow}{in} \PY{n}{code\PYZus{}typed}\PY{p}{(}\PY{o}{+}\PY{p}{,}\PY{p}{(}\PY{n}{Number}\PY{p}{,}\PY{p}{)}\PY{p}{)}\PY{p}{]}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}8{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}2-element Array\{Type\{T<:Top\},1\}:
+ Int64
+ Number\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}9{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n+nb}{map}\PY{p}{(}\PY{n}{returntype}\PY{p}{,}\PY{n}{code\PYZus{}typed}\PY{p}{(}\PY{o}{+}\PY{p}{,}\PY{p}{(}\PY{n}{Any}\PY{p}{,}\PY{n}{Any}\PY{p}{,}\PY{n}{Any}\PY{p}{)}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}9{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}3-element Array\{Any,1\}:
+ BigInt
+ BigFloat
+ Any\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+\subsection{A Function to Retrieve All Expression in the Function Body}The inner \texttt{Expr} with head \texttt{:body} contains the body of
+the function: its \texttt{args} is an array of \texttt{Expr}s. This is
+another convenience function to make the code more readable.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}10{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{body}\PY{p}{(}\PY{n}{e}\PY{p}{:}\PY{p}{:}\PY{n}{Expr}\PY{p}{)} \PY{o}{=} \PY{n}{e}\PY{o}{.}\PY{n}{args}\PY{p}{[}\PY{l+m+mi}{3}\PY{p}{]}\PY{o}{.}\PY{n}{args}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}10{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}body (generic function with 1 method)\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+It is used analogously to \texttt{returntype} above.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}11{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{body}\PY{p}{(}\PY{n}{code\PYZus{}typed}\PY{p}{(}\PY{n}{foo}\PY{p}{,}\PY{p}{(}\PY{n}{Int}\PY{p}{,}\PY{p}{)}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}11{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}4-element Array\{Any,1\}:
+ :( \# In[2], line 2:)
+ :(z = top(box)(Int64,top(add\_int)(x::Int64,5))::Int64)
+ :( \# line 3:)
+ :(return top(box)(Int64,top(mul\_int)(2,z::Int64))::Int64)\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+\subsection{A Function to Retrieve All Return Statements From a Function}\texttt{Expr}s that represent return statements have \texttt{head} set
+to \texttt{:return}, so the below function pulls them out of the body.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}12{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{returns}\PY{p}{(}\PY{n}{e}\PY{p}{:}\PY{p}{:}\PY{n}{Expr}\PY{p}{)} \PY{o}{=} \PY{n+nb}{filter}\PY{p}{(}\PY{n}{x}\PY{o}{\PYZhy{}}\PY{o}{\PYZgt{}} \PY{n}{typeof}\PY{p}{(}\PY{n}{x}\PY{p}{)} \PY{o}{==} \PY{n}{Expr} \PY{o}{\PYZam{}}\PY{o}{\PYZam{}} \PY{n}{x}\PY{o}{.}\PY{n}{head}\PY{o}{==}\PY{p}{:}\PY{k}{return}\PY{p}{,}\PY{n}{body}\PY{p}{(}\PY{n}{e}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}12{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}returns (generic function with 1 method)\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}13{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{returns}\PY{p}{(}\PY{n}{code\PYZus{}typed}\PY{p}{(}\PY{n}{foo}\PY{p}{,}\PY{p}{(}\PY{n}{Int}\PY{p}{,}\PY{p}{)}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}13{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}1-element Array\{Any,1\}:
+ :(return top(box)(Int64,top(mul\_int)(2,z::Int64))::Int64)\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}14{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{function} \PY{n}{barr}\PY{p}{(}\PY{n}{x}\PY{p}{:}\PY{p}{:}\PY{n}{Int}\PY{p}{)}
+    \PY{n}{x} \PY{o}{+} \PY{l+m+mi}{2}
+\PY{n}{end}
+
+\PY{n}{returns}\PY{p}{(}\PY{n}{code\PYZus{}typed}\PY{p}{(}\PY{n}{barr}\PY{p}{,}\PY{p}{(}\PY{n}{Int}\PY{p}{,}\PY{p}{)}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}14{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}1-element Array\{Any,1\}:
+ :(return top(box)(Int64,top(add\_int)(x::Int64,2))::Int64)\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+Notice that we still get a \texttt{:return}, even if we don't use the
+keyword \texttt{return}. The last expression in a function becomes the
+return value if there is no \texttt{return}, and this is expressed in
+the AST by desugaring to a normal \texttt{:return}.\subsection{Other Helper Functions}My project resulted in the \texttt{TypeCheck.jl} package for Julia. It
+is unlikely to be worth the space to explain the implementation of all
+the other helper functions I wrote here. I'll use functions from
+\texttt{TypeCheck} later, with comments explaining briefly what they do.\part{Checking for Stable Return Types}It is good style in Julia for the return type of a method to only depend
+on the types of the arguments and not on their values. This stability
+makes behavior more predictable for programmers. It also allows type
+inference to work better -- stable types on called methods allows stable
+types on the variables you put the return values into.The following method is a simple example of an unstable return type.
+Sometimes it returns an \texttt{Int} and sometimes a \texttt{Bool}. The
+return type of this method would be inferred as
+\texttt{Union(Int64,Bool)}.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}15{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{function} \PY{n}{unstable}\PY{p}{(}\PY{n}{x}\PY{p}{:}\PY{p}{:}\PY{n}{Int}\PY{p}{)}
+  \PY{k}{if} \PY{n}{x} \PY{o}{\PYZgt{}} \PY{l+m+mi}{5}
+    \PY{k}{return} \PY{n}{x}
+  \PY{k}{else}
+    \PY{k}{return} \PY{n}{false}
+  \PY{n}{end}
+\PY{n}{end}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}15{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}unstable (generic function with 1 method)\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}16{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{unstable}\PY{p}{(}\PY{l+m+mi}{5}\PY{p}{)}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}16{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}false\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}17{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{unstable}\PY{p}{(}\PY{l+m+mi}{1337}\PY{p}{)}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}17{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}1337\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+Until now, there has been no way to automatically check that methods do
+not behave in this way. Julia's base library is mostly free of this,
+through the use of code review. While there are instances of
+instability, they tend to be less obvious -- they stem especially from
+retrieving data from untyped storage, from some interfaces to other
+environments, or from places where it is necessary (higher-level
+functions).I have written a static checker to detect that this invariant may be
+violated. My approach tends more towards false positives than false
+negatives.\section{Deciding Whether the Return Type is Probably Stable}If the types of an argument to a method are all concrete, then the
+return type should also be concrete.\subsection{Concrete, Abstract, and Union Types}I've already mentioned concrete and abstract types, which are the leaves
+and internal nodes of the type hierarchy, respectively. Union types are
+collection of types. They are similar to abstract types in that they
+have subtypes, but they do not have names and do not alter the type
+hierarchy. Union types provide a way to say ``Any of these types or
+their subtypes''.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}18{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{p}{[}\PY{n}{Int}\PY{p}{,} \PY{n}{String}\PY{p}{,} \PY{n}{Union}\PY{p}{(}\PY{n}{Float64}\PY{p}{,}\PY{n}{UTF8String}\PY{p}{)}\PY{p}{]}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}18{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}3-element Array\{Type\{T<:Top\},1\}:
+ Int64
+ String
+ Union(UTF8String,Float64)\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+Unlike concrete and abstract types, union types are not represented by
+\texttt{DataType}; they have their own type, \texttt{UnionType}.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}19{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{p}{[}\PY{n}{typeof}\PY{p}{(}\PY{n}{x}\PY{p}{)} \PY{k}{for} \PY{n}{x} \PY{o+ow}{in} \PY{n}{ans}\PY{p}{]}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}19{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}3-element Array\{Type\{\_\},1\}:
+ DataType
+ DataType
+ UnionType\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+There is a convenient function for differetiating between concrete types
+and all other types: \texttt{isleaftype}. It returns true for concrete
+types (the leaves of the type hierarchy) and false for abstract types
+and union types.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}20{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{isleaftype}\PY{p}{(}\PY{n}{Uint128}\PY{p}{)}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}20{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}true\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}21{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{isleaftype}\PY{p}{(}\PY{n}{String}\PY{p}{)}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}21{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}false\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}22{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{isleaftype}\PY{p}{(}\PY{n}{Union}\PY{p}{(}\PY{n}{Int}\PY{p}{,}\PY{n}{Float32}\PY{p}{,}\PY{n}{ASCIIString}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}22{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}false\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+\subsection{The Basic Check}Given an \texttt{Expr} from \texttt{code\_typed}, we want to grab the
+types of the arguments and the return type. If the return type is
+concrete, then everything is fine: a concrete type can't be unstable. If
+the return type is not concrete and at least one argument is not
+concrete, then I don't warn about that method: the cause could be the
+possible types of the non-concrete argument types.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}23{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{using} \PY{n}{TypeCheck}
+\PY{n}{function} \PY{n}{isreturnbasedonvalues}\PY{p}{(}\PY{n}{e}\PY{p}{:}\PY{p}{:}\PY{n}{Expr}\PY{p}{)}
+  \PY{n}{rt} \PY{o}{=} \PY{n}{returntype}\PY{p}{(}\PY{n}{e}\PY{p}{)}
+  \PY{n}{ts} \PY{o}{=} \PY{n}{TypeCheck}\PY{o}{.}\PY{n}{argtypes}\PY{p}{(}\PY{n}{e}\PY{p}{)} \PY{c}{\PYZsh{}the type of each argument in e\PYZsq{}s type signature}
+
+  \PY{k}{if} \PY{n}{isleaftype}\PY{p}{(}\PY{n}{rt}\PY{p}{)} \PY{o}{|}\PY{o}{|} \PY{n}{rt} \PY{o}{==} \PY{n+nb+bp}{None}
+    \PY{k}{return} \PY{n}{false}
+  \PY{n}{end}
+
+  \PY{k}{for} \PY{n}{t} \PY{o+ow}{in} \PY{n}{ts}
+   \PY{k}{if} \PY{err}{!}\PY{n}{isleaftype}\PY{p}{(}\PY{n}{t}\PY{p}{)}
+     \PY{k}{return} \PY{n}{false}
+   \PY{n}{end}
+  \PY{n}{end}
+
+  \PY{k}{return} \PY{n}{true} \PY{c}{\PYZsh{} return is not concrete type; all args are concrete types}
+\PY{n}{end}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}23{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}isreturnbasedonvalues (generic function with 1 method)\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}24{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{isreturnbasedonvalues}\PY{p}{(}\PY{n}{code\PYZus{}typed}\PY{p}{(}\PY{n}{unstable}\PY{p}{,}\PY{p}{(}\PY{n}{Int}\PY{p}{,}\PY{p}{)}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}24{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}true\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}25{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{isreturnbasedonvalues}\PY{p}{(}\PY{n}{code\PYZus{}typed}\PY{p}{(}\PY{n}{foo}\PY{p}{,}\PY{p}{(}\PY{n}{Int}\PY{p}{,}\PY{p}{)}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}25{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}false\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+While this check works on simple examples, it tends to have many
+false-positives when running on large modules, such as the standard
+library.\section{Preventing One Unstable Function from Spawning Many More Warnings}With the simple function above, I get a lot of warnings on the base
+library. When I dug into the causes of some of them, there was a
+frequent pattern. Many functions would trigger warnings because their
+return type depended on a call to another function. A small handful of
+functions would actually need changes to become type-stable, but they
+are lost in the sea of their users.
+
+These users are sort of ``semi-false-positives'': their return type is
+actually unstable, but it's not their fault -- and the change probably
+shouldn't happen there. Most of these functions can be filtered out by
+looking at the \texttt{:return}s in the function body and letting them
+pass if their return type is determined by \texttt{:call}s to other
+functions (which are unstable).
+
+To be more specific, if \texttt{foo} calls \texttt{barr}, and
+\texttt{barr} is unstable, then I would like to only warn the user about
+\texttt{barr}, not about \texttt{foo}. This simple check will only work
+if \texttt{foo}'s final expression or \texttt{return} expression is a
+call to \texttt{barr}. Somewhat surprisingly, this seems to work for
+basically all of the standard library.\subsection{A Example of Return Type Propogation}Here, \texttt{f1} is unstable. We should make a change to \texttt{f1} if
+we want it's return type to be stable.
+\texttt{isreturntypebasedonvalues} would also warn about \texttt{f2}.
+However, \texttt{f2} just calls \texttt{f1}, so there's not necessarily
+a change to be made to \texttt{f2}.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}31{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{f1}\PY{p}{(}\PY{n}{x}\PY{p}{:}\PY{p}{:}\PY{n}{Int}\PY{p}{)} \PY{o}{=} \PY{n}{x} \PY{o}{==} \PY{l+m+mi}{5} \PY{err}{?} \PY{l+m+mi}{42} \PY{p}{:} \PY{n}{pi}
+\PY{n}{returntype}\PY{p}{(}\PY{n}{code\PYZus{}typed}\PY{p}{(}\PY{n}{f1}\PY{p}{,}\PY{p}{(}\PY{n}{Int}\PY{p}{,}\PY{p}{)}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}31{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}Union(Int64,MathConst\{:π\})\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}32{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{f2}\PY{p}{(}\PY{n}{y}\PY{p}{:}\PY{p}{:}\PY{n}{Int}\PY{p}{)} \PY{o}{=} \PY{n}{f1}\PY{p}{(}\PY{n}{y} \PY{o}{+} \PY{l+m+mi}{2}\PY{p}{)}
+\PY{n}{returntype}\PY{p}{(}\PY{n}{code\PYZus{}typed}\PY{p}{(}\PY{n}{f2}\PY{p}{,}\PY{p}{(}\PY{n}{Int}\PY{p}{,}\PY{p}{)}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}32{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}Union(Int64,MathConst\{:π\})\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+\subsection{Preventing Propogation}We can add this to \texttt{isreturntypebasedonvalues} by giving failing
+functions a second chance. This means we can add another check after the
+loop that looks for non-concrete argument types.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}41{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{function} \PY{n}{isreturnbasedonvalues}\PY{p}{(}\PY{n}{e}\PY{p}{:}\PY{p}{:}\PY{n}{Expr}\PY{p}{)}
+    \PY{n}{rt} \PY{o}{=} \PY{n}{returntype}\PY{p}{(}\PY{n}{e}\PY{p}{)}
+    \PY{n}{ts} \PY{o}{=} \PY{n}{TypeCheck}\PY{o}{.}\PY{n}{argtypes}\PY{p}{(}\PY{n}{e}\PY{p}{)}
+
+    \PY{k}{if} \PY{n}{isleaftype}\PY{p}{(}\PY{n}{rt}\PY{p}{)} \PY{o}{|}\PY{o}{|} \PY{n}{rt} \PY{o}{==} \PY{n+nb+bp}{None}
+      \PY{k}{return} \PY{n}{false}
+    \PY{n}{end}
+    \PY{k}{for} \PY{n}{t} \PY{o+ow}{in} \PY{n}{ts}
+     \PY{k}{if} \PY{err}{!}\PY{n}{isleaftype}\PY{p}{(}\PY{n}{t}\PY{p}{)}
+       \PY{k}{return} \PY{n}{false}
+     \PY{n}{end}
+    \PY{n}{end}
+
+    \PY{c}{\PYZsh{}a second chance}
+    \PY{c}{\PYZsh{}cs is a list of return types for calls in :return exprs in e\PYZsq{}s body}
+    \PY{n}{cs} \PY{o}{=} \PY{p}{[}\PY{n}{TypeCheck}\PY{o}{.}\PY{n}{find\PYZus{}returntype}\PY{p}{(}\PY{n}{c}\PY{p}{,}\PY{n}{e}\PY{p}{)} \PY{k}{for} \PY{n}{c} \PY{o+ow}{in} \PY{n}{TypeCheck}\PY{o}{.}\PY{n}{extract\PYZus{}calls\PYZus{}from\PYZus{}returns}\PY{p}{(}\PY{n}{e}\PY{p}{)}\PY{p}{]}
+    \PY{k}{for} \PY{n}{c} \PY{o+ow}{in} \PY{n}{cs}
+     \PY{k}{if} \PY{n}{rt} \PY{o}{==} \PY{n}{c} \PY{c}{\PYZsh{}if e\PYZsq{}s return type is the same as a call it\PYZsq{}s making, then it passes}
+         \PY{k}{return} \PY{n}{false}
+      \PY{n}{end}
+    \PY{n}{end}
+
+    \PY{k}{return} \PY{n}{true} \PY{c}{\PYZsh{}e fails the test}
+  \PY{n}{end}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}41{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}isreturnbasedonvalues (generic function with 1 method)\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+Above, I use two new helper functions \texttt{find\_returntype} and
+\texttt{extract\_calls\_from\_returns}.
+\texttt{extract\_calls\_from\_returns} is not expecially interesting; it
+just examines the insides of \texttt{:return} \texttt{Expr}s for
+\texttt{:call} \texttt{Expr}s. \texttt{find\_returntype} is more
+interesting, and I will explain it below.\subsubsection{Results:}
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}37{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{isreturnbasedonvalues}\PY{p}{(}\PY{n}{code\PYZus{}typed}\PY{p}{(}\PY{n}{foo}\PY{p}{,}\PY{p}{(}\PY{n}{Int}\PY{p}{,}\PY{p}{)}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)} \PY{c}{\PYZsh{}passes}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}37{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}false\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}38{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{isreturnbasedonvalues}\PY{p}{(}\PY{n}{code\PYZus{}typed}\PY{p}{(}\PY{n}{f1}\PY{p}{,}\PY{p}{(}\PY{n}{Int}\PY{p}{,}\PY{p}{)}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)} \PY{c}{\PYZsh{}fails}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}38{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}true\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}40{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{isreturnbasedonvalues}\PY{p}{(}\PY{n}{code\PYZus{}typed}\PY{p}{(}\PY{n}{f2}\PY{p}{,}\PY{p}{(}\PY{n}{Int}\PY{p}{,}\PY{p}{)}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)} \PY{c}{\PYZsh{}passes}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}40{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}false\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+\section{Determining the Return Type of a \texttt{:call}}Here, we start with the output of
+\texttt{extract\_calls\_from\_returns}.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}44{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{cs} \PY{o}{=} \PY{n}{TypeCheck}\PY{o}{.}\PY{n}{extract\PYZus{}calls\PYZus{}from\PYZus{}returns}\PY{p}{(}\PY{n}{code\PYZus{}typed}\PY{p}{(}\PY{n}{f2}\PY{p}{,}\PY{p}{(}\PY{n}{Int}\PY{p}{,}\PY{p}{)}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}44{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}1-element Array\{Expr,1\}:
+ :(f1(top(box)(Int64,top(add\_int)(y::Int64,2))::Int64)::Union(Int64,Ma
+thConst\{:π\}))\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+From this, we need to extract the types of the arguments it is being
+called with. (We need this to determine which method would be called.)
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}46{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{cs}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{o}{.}\PY{n}{args}\PY{p}{[}\PY{l+m+mi}{2}\PY{p}{]}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}46{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}:(top(box)(Int64,top(add\_int)(y::Int64,2))::Int64)\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+The above gets us the first argument to the \texttt{:call}, but it is
+still a whole \texttt{Expr}, not a simple value. Luckily, as you can see
+at the end, it has been annotated with an inferred type already.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}47{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{cs}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{o}{.}\PY{n}{args}\PY{p}{[}\PY{l+m+mi}{2}\PY{p}{]}\PY{o}{.}\PY{n}{args}\PY{p}{[}\PY{l+m+mi}{2}\PY{p}{]}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}47{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}:Int64\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+Thus for this example, we know that it is the function named
+\texttt{cs{[}1{]}.args{[}1{]}} being called with
+\texttt{cs{[}1{]}.args{[}2{]}.args{[}2{]}}.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}48{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{println}\PY{p}{(}\PY{n}{cs}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{o}{.}\PY{n}{args}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
+\PY{n}{println}\PY{p}{(}\PY{n}{cs}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{o}{.}\PY{n}{args}\PY{p}{[}\PY{l+m+mi}{2}\PY{p}{]}\PY{o}{.}\PY{n}{args}\PY{p}{[}\PY{l+m+mi}{2}\PY{p}{]}\PY{p}{)}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}f1
+Int64
+\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+However, for this \texttt{cs{[}1{]}}, the type inference has already
+provided a return type -- \texttt{Union(Int64,MathConst\{:π\})}.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}49{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{cs}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{o}{.}\PY{n}{typ}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}49{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}Union(Int64,MathConst\{:π\})\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+Since there can be some digging around in the \texttt{Expr}s and other
+\texttt{Expr}-like things (\texttt{Symbol}s,\texttt{Int}s, etc) that
+occur in \texttt{:call} arugments, I wrote \texttt{find\_returntype} to
+encapsulate that logic.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}50{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{function} \PY{n}{find\PYZus{}returntype}\PY{p}{(}\PY{n}{e}\PY{p}{:}\PY{p}{:}\PY{n}{Expr}\PY{p}{,}\PY{n}{context}\PY{p}{:}\PY{p}{:}\PY{n}{Expr}\PY{p}{)} \PY{c}{\PYZsh{}must be :call,:new,:call1}
+  \PY{k}{if} \PY{n}{Base}\PY{o}{.}\PY{n}{is\PYZus{}expr}\PY{p}{(}\PY{n}{e}\PY{p}{,}\PY{p}{:}\PY{n}{new}\PY{p}{)}\PY{p}{;} \PY{k}{return} \PY{n}{e}\PY{o}{.}\PY{n}{typ}\PY{p}{;} \PY{n}{end}
+  \PY{k}{if} \PY{n}{Base}\PY{o}{.}\PY{n}{is\PYZus{}expr}\PY{p}{(}\PY{n}{e}\PY{p}{,}\PY{p}{:}\PY{n}{call1}\PY{p}{)} \PY{o}{\PYZam{}}\PY{o}{\PYZam{}} \PY{n}{isa}\PY{p}{(}\PY{n}{e}\PY{o}{.}\PY{n}{args}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{,} \PY{n}{TopNode}\PY{p}{)}\PY{p}{;} \PY{k}{return} \PY{n}{e}\PY{o}{.}\PY{n}{typ}\PY{p}{;} \PY{n}{end}
+  \PY{k}{if} \PY{err}{!}\PY{n}{Base}\PY{o}{.}\PY{n}{is\PYZus{}expr}\PY{p}{(}\PY{n}{e}\PY{p}{,}\PY{p}{:}\PY{n}{call}\PY{p}{)}\PY{p}{;} \PY{n}{error}\PY{p}{(}\PY{l+s}{\PYZdq{}}\PY{l+s}{Expected :call Expr}\PY{l+s}{\PYZdq{}}\PY{p}{)}\PY{p}{;} \PY{n}{end}
+
+  \PY{k}{if} \PY{n}{is\PYZus{}top}\PY{p}{(}\PY{n}{e}\PY{p}{)}
+    \PY{k}{return} \PY{n}{e}\PY{o}{.}\PY{n}{typ}
+  \PY{n}{end}
+
+  \PY{n}{callee} \PY{o}{=} \PY{n}{e}\PY{o}{.}\PY{n}{args}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}
+  \PY{k}{if} \PY{n}{is\PYZus{}top}\PY{p}{(}\PY{n}{callee}\PY{p}{)}
+    \PY{k}{return} \PY{n}{find\PYZus{}returntype}\PY{p}{(}\PY{n}{callee}\PY{p}{,}\PY{n}{context}\PY{p}{)}
+  \PY{n}{elseif} \PY{n}{isa}\PY{p}{(}\PY{n}{callee}\PY{p}{,}\PY{n}{SymbolNode}\PY{p}{)} \PY{c}{\PYZsh{} only seen (func::F), so non\PYZhy{}generic function}
+    \PY{k}{return} \PY{n}{Any}
+  \PY{n}{elseif} \PY{o+ow}{is}\PY{p}{(}\PY{n}{callee}\PY{p}{,}\PY{n}{Symbol}\PY{p}{)}
+    \PY{k}{if} \PY{n}{e}\PY{o}{.}\PY{n}{typ} \PY{o}{!=} \PY{n}{Any} \PY{o}{|}\PY{o}{|} \PY{n+nb}{any}\PY{p}{(}\PY{p}{[}\PY{n}{isa}\PY{p}{(}\PY{n}{x}\PY{p}{,}\PY{n}{LambdaStaticData}\PY{p}{)} \PY{k}{for} \PY{n}{x} \PY{o+ow}{in} \PY{n}{e}\PY{o}{.}\PY{n}{args}\PY{p}{[}\PY{l+m+mi}{2}\PY{p}{:}\PY{n}{end}\PY{p}{]}\PY{p}{]}\PY{p}{)}
+      \PY{k}{return} \PY{n}{e}\PY{o}{.}\PY{n}{typ}
+    \PY{n}{end}
+
+    \PY{k}{if} \PY{n}{isdefined}\PY{p}{(}\PY{n}{Base}\PY{p}{,}\PY{n}{callee}\PY{p}{)}
+      \PY{n}{f} \PY{o}{=} \PY{n+nb}{eval}\PY{p}{(}\PY{n}{Base}\PY{p}{,}\PY{n}{callee}\PY{p}{)}
+      \PY{k}{if} \PY{err}{!}\PY{n}{isa}\PY{p}{(}\PY{n}{f}\PY{p}{,}\PY{n}{Function}\PY{p}{)} \PY{o}{|}\PY{o}{|} \PY{err}{!}\PY{n}{isgeneric}\PY{p}{(}\PY{n}{f}\PY{p}{)}
+        \PY{k}{return} \PY{n}{e}\PY{o}{.}\PY{n}{typ}
+      \PY{n}{end}
+      \PY{n}{fargtypes} \PY{o}{=} \PY{n+nb}{tuple}\PY{p}{(}\PY{p}{[}\PY{n}{find\PYZus{}argtype}\PY{p}{(}\PY{n}{ea}\PY{p}{,}\PY{n}{context}\PY{p}{)} \PY{k}{for} \PY{n}{ea} \PY{o+ow}{in} \PY{n}{e}\PY{o}{.}\PY{n}{args}\PY{p}{[}\PY{l+m+mi}{2}\PY{p}{:}\PY{n}{end}\PY{p}{]}\PY{p}{]}\PY{p}{)}
+      \PY{k}{return} \PY{n}{Union}\PY{p}{(}\PY{p}{[}\PY{n}{returntype}\PY{p}{(}\PY{n}{ef}\PY{p}{)} \PY{k}{for} \PY{n}{ef} \PY{o+ow}{in} \PY{n}{code\PYZus{}typed}\PY{p}{(}\PY{n}{f}\PY{p}{,}\PY{n}{fargtypes}\PY{p}{)}\PY{p}{]}\PY{o}{.}\PY{o}{.}\PY{o}{.}\PY{p}{)}
+    \PY{k}{else}
+      \PY{k}{return} \PY{n+nd}{@show} \PY{n}{e}\PY{o}{.}\PY{n}{typ}
+    \PY{n}{end}
+  \PY{n}{end}
+
+  \PY{k}{return} \PY{n}{e}\PY{o}{.}\PY{n}{typ}
+\PY{n}{end}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}50{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}find\_returntype (generic function with 1 method)\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+\subsection{Deciding If It's Not This Function's Fault}If a function is calling another with concrete types, there will only be
+one possible method to get called. In that case, it is probably the
+callee's fault that the return type is bad.
+
+If a function is calling another with looser types, there may be
+multiple possible methods that could get called. In that case, the way
+the second function is being used may be causing the problem. If the
+arguments to the caller are all concrete, where is it getting an
+abstract type to call this other function?However, if you are just trying to see if one function is type-stable,
+you might care about \texttt{foo}'s unstability, even if it's really
+\texttt{barr}'s fault.\part{Stable Types Inside Loops}In Julia, for-loops are generally the fastest way to write code. (Faster
+than vectorized code; faster than maps or folds.) One way to
+accidentally decrease their performance is to change the type of a
+variable in the loop. If all the variables in a loop have stable types,
+then the code Julia outputs will be the same tight, fast code as a
+typed, compiled language. If any variable has a type that changes,
+slower dynamic code will be produced to handle that.It can be easy to write code that has this problem, if you're not aware
+of it, even in simple programs.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}26{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{x} \PY{o}{=} \PY{l+m+mi}{5} \PY{c}{\PYZsh{} x is an Int}
+\PY{k}{for} \PY{n}{i}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{:}\PY{l+m+mi}{1000}
+ \PY{n}{x} \PY{o}{+}\PY{o}{=} \PY{l+m+mi}{100}
+ \PY{n}{x} \PY{o}{/}\PY{o}{=} \PY{l+m+mi}{2} \PY{c}{\PYZsh{} x is a Float64}
+\PY{n}{end} 
+\PY{n}{x} \PY{c}{\PYZsh{}x is a Float64}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}26{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}100.0\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+In this code example, \texttt{x} begins life as an \texttt{Int}. In the
+first iteration of the loop, \texttt{x += 100} takes \texttt{x} as an
+\texttt{Int} and returns an \texttt{Int}; \texttt{x /= 2} takes this new
+\texttt{Int} and returns a \texttt{Float64}. After this, \texttt{x} will
+be a \texttt{Float64} for all the remaining iterations of the loop. This
+means that the extra dynamic code that is needed to handle \texttt{x}
+being either an \texttt{Int} or a \texttt{Float64} slows down all the
+iterations, despite only being needed for the first one. This can be
+fixed by making \texttt{x} a \texttt{Float64} from the start:
+\texttt{x = 5.0}.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}27{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{x} \PY{o}{=} \PY{l+m+mf}{5.0} \PY{c}{\PYZsh{} x is a Float64}
+\PY{k}{for} \PY{n}{i}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{:}\PY{l+m+mi}{1000}
+ \PY{n}{x} \PY{o}{+}\PY{o}{=} \PY{l+m+mi}{100}
+ \PY{n}{x} \PY{o}{/}\PY{o}{=} \PY{l+m+mi}{2} \PY{c}{\PYZsh{} x is a Float64}
+\PY{n}{end} 
+\PY{n}{x} \PY{c}{\PYZsh{}x is a Float64}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}27{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}100.0\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+Variables whose types change in loops can be detected in generic
+functions by looking at the output of \texttt{code\_typed}. Since loops
+are lowered to gotos, we need to first find the loops and then check the
+types of the variables involved. Finding loops can be as simple as
+looking for gotos that jump backwards in the function: gotos whose
+labels precede them. Each instruction between the goto and its label is
+part of the loop body. For each instruction in the loop body, we can
+look at the inferred type of any variables involved. If the inferred
+type is a UnionType (or not a leaf type), then the variable's type is
+unstable.\section{Collecting the Contents of a Loop}Let's begin by defining an example function to work with.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}38{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{function} \PY{n}{bar}\PY{p}{(}\PY{n}{x}\PY{p}{:}\PY{p}{:}\PY{n}{Int}\PY{p}{)}
+  \PY{k}{for} \PY{n}{i}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{:}\PY{l+m+mi}{1000}
+    \PY{n}{x} \PY{o}{+}\PY{o}{=} \PY{l+m+mi}{100}
+    \PY{n}{x} \PY{o}{/}\PY{o}{=} \PY{l+m+mi}{2}
+  \PY{n}{end}
+  \PY{n}{x}
+\PY{n}{end}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}38{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}bar (generic function with 1 method)\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+The goal is to write a function that takes a method of a generic
+function and extracts the typed body of any loops. First, we can get the
+typed body of the function.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}40{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{b} \PY{o}{=} \PY{n}{body}\PY{p}{(}\PY{n}{bar}\PY{p}{,}\PY{p}{(}\PY{n}{Int}\PY{p}{,}\PY{p}{)}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}40{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}16-element Array\{Any,1\}:
+ :( \# In[38], line 2:)
+ :(\#s79 = 1)
+ :(1: )
+ :(unless top(sle\_int)(\#s79::Int64,1000)::Bool goto 2)
+ :(i = \#s79::Int64)
+ :( \# line 3:)
+ :(x = +(x::Union(Int64,Float64),100)::Union(Int64,Float64))
+ :( \# line 4:)
+ :(x = /(x::Union(Int64,Float64),2)::Float64)
+ :(3: )
+ :(\#s79 = top(box)(Int64,top(add\_int)(1,\#s79::Int64))::Int64)
+ :(goto 1)
+ :(2: )
+ :(0: )
+ :( \# line 6:)
+ :(return x::Union(Int64,Float64))\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+The above is an array of \texttt{Expr}s and other expression types. We
+want to find out if, for each \texttt{goto} and \texttt{unless}, whether
+their destination label comes before them. Another way to do this is to
+look at all labels, and check for \texttt{goto}s that jump back to each
+one. While checking to see if we're in a loop, we'll also need to deal
+with nested loops and knowing when we've finished our loop.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}44{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{inloops} \PY{o}{=} \PY{l+m+mi}{0}
+\PY{n}{ends} \PY{o}{=} \PY{n}{Int}\PY{p}{[}\PY{p}{]}
+\PY{n}{loopbody} \PY{o}{=} \PY{p}{\PYZob{}}\PY{p}{\PYZcb{}}
+\PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{l+m+mi}{1}\PY{p}{:}\PY{n}{length}\PY{p}{(}\PY{n}{b}\PY{p}{)}
+  \PY{k}{if} \PY{n}{typeof}\PY{p}{(}\PY{n}{b}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{)} \PY{o}{==} \PY{n}{LabelNode}
+    \PY{n}{l} \PY{o}{=} \PY{n}{b}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{o}{.}\PY{n}{label}
+    \PY{n}{jumpback} \PY{o}{=} \PY{n}{findnext}\PY{p}{(}\PY{n}{x} \PY{o}{\PYZhy{}}\PY{o}{\PYZgt{}} \PY{n}{typeof}\PY{p}{(}\PY{n}{x}\PY{p}{)} \PY{o}{==} \PY{n}{GotoNode} \PY{o}{\PYZam{}}\PY{o}{\PYZam{}} \PY{n}{x}\PY{o}{.}\PY{n}{label} \PY{o}{==} \PY{n}{l}\PY{p}{,} \PY{n}{b}\PY{p}{,} \PY{n}{i}\PY{p}{)}
+    \PY{k}{if} \PY{n}{jumpback} \PY{o}{!=}\PY{l+m+mi}{0} \PY{c}{\PYZsh{}then there\PYZsq{}s a goto that jumps here}
+      \PY{n}{println}\PY{p}{(}\PY{l+s}{\PYZdq{}}\PY{l+s}{loop from \PYZdl{}i to \PYZdl{}jumpback}\PY{l+s}{\PYZdq{}}\PY{p}{)}
+      \PY{n}{push}\PY{err}{!}\PY{p}{(}\PY{n}{ends}\PY{p}{,}\PY{n}{jumpback}\PY{p}{)}
+      \PY{n}{inloops} \PY{o}{+}\PY{o}{=} \PY{l+m+mi}{1}
+    \PY{n}{end}
+  \PY{n}{end}
+ 
+  \PY{k}{if} \PY{n}{inloops} \PY{o}{\PYZgt{}} \PY{l+m+mi}{0}
+    \PY{n}{println}\PY{p}{(}\PY{l+s}{\PYZdq{}}\PY{l+s+se}{\PYZbs{}t}\PY{l+s}{\PYZdl{}(b[i])}\PY{l+s}{\PYZdq{}}\PY{p}{)}
+    \PY{n}{push}\PY{err}{!}\PY{p}{(}\PY{n}{loopbody}\PY{p}{,}\PY{n}{b}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{)}
+  \PY{n}{end}
+
+  \PY{k}{if} \PY{n}{i} \PY{o+ow}{in} \PY{n}{ends}
+    \PY{n}{splice}\PY{err}{!}\PY{p}{(}\PY{n}{ends}\PY{p}{,}\PY{n}{findfirst}\PY{p}{(}\PY{n}{ends}\PY{p}{,}\PY{n}{i}\PY{p}{)}\PY{p}{)}
+    \PY{n}{inloops} \PY{o}{\PYZhy{}}\PY{o}{=} \PY{l+m+mi}{1}
+  \PY{n}{end}
+ 
+\PY{n}{end}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}loop from 3 to 12
+        :(1: )
+        :(unless top(sle\_int)(\#s79::Int64,1000)::Bool goto 2)
+        :(i = \#s79::Int64)
+        :( \# line 3:)
+        :(x = +(x::Union(Int64,Float64),100)::Union(Int64,Float64))
+        :( \# line 4:)
+        :(x = /(x::Union(Int64,Float64),2)::Float64)
+        :(3: )
+        :(\#s79 = top(box)(Int64,top(add\_int)(1,\#s79::Int64))::Int64)
+        :(goto 1)
+\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+We still have a lot of noise here, in the form of line numbers and
+irrelevant labels.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}31{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{typeof}\PY{p}{(}\PY{n}{loopbody}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)} \PY{c}{\PYZsh{}:(1: )}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}31{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}LabelNode\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}32{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{typeof}\PY{p}{(}\PY{n}{loopbody}\PY{p}{[}\PY{l+m+mi}{4}\PY{p}{]}\PY{p}{)} \PY{c}{\PYZsh{}:( \PYZsh{} line 3:)}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}32{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}LineNumberNode\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}45{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n+nb}{filter}\PY{p}{(}\PY{n}{x} \PY{o}{\PYZhy{}}\PY{o}{\PYZgt{}} \PY{n}{typeof}\PY{p}{(}\PY{n}{x}\PY{p}{)} \PY{o}{!=} \PY{n}{LineNumberNode} \PY{o}{\PYZam{}}\PY{o}{\PYZam{}} \PY{n}{typeof}\PY{p}{(}\PY{n}{x}\PY{p}{)} \PY{o}{!=} \PY{n}{LabelNode}\PY{p}{,} \PY{n}{loopbody}\PY{p}{)}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}45{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}6-element Array\{Any,1\}:
+ :(unless top(sle\_int)(\#s79::Int64,1000)::Bool goto 2)
+ :(i = \#s79::Int64)
+ :(x = +(x::Union(Int64,Float64),100)::Union(Int64,Float64))
+ :(x = /(x::Union(Int64,Float64),2)::Float64)
+ :(\#s79 = top(box)(Int64,top(add\_int)(1,\#s79::Int64))::Int64)
+ :(goto 1)\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+This is quite nice. We have the \texttt{unless} that contains the exit
+condition for the for loop, we have the loop variable \texttt{i} and
+\texttt{\#s79}, and we have the two function calls that modify
+\texttt{x}.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}34{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+  \PY{c}{\PYZsh{} This is a function for trying to detect loops in a method of a generic function}
+  \PY{c}{\PYZsh{} It takes the same arguments as code\PYZus{}typed}
+  \PY{c}{\PYZsh{} And returns the lines that are inside one or more loops}
+  \PY{n}{function} \PY{n}{loopcontents}\PY{p}{(}\PY{n}{args}\PY{o}{.}\PY{o}{.}\PY{o}{.}\PY{p}{)}
+    \PY{n}{e} \PY{o}{=} \PY{n}{code\PYZus{}typed}\PY{p}{(}\PY{n}{args}\PY{o}{.}\PY{o}{.}\PY{o}{.}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}
+    \PY{n}{body} \PY{o}{=} \PY{n}{e}\PY{o}{.}\PY{n}{args}\PY{p}{[}\PY{l+m+mi}{3}\PY{p}{]}\PY{o}{.}\PY{n}{args}
+    \PY{n}{loops} \PY{o}{=} \PY{n}{Int}\PY{p}{[}\PY{p}{]}
+    \PY{n}{nesting} \PY{o}{=} \PY{l+m+mi}{0}
+    \PY{n}{lines} \PY{o}{=} \PY{p}{\PYZob{}}\PY{p}{\PYZcb{}}
+    \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{l+m+mi}{1}\PY{p}{:}\PY{n}{length}\PY{p}{(}\PY{n}{body}\PY{p}{)}
+      \PY{k}{if} \PY{n}{typeof}\PY{p}{(}\PY{n}{body}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{)} \PY{o}{==} \PY{n}{LabelNode}
+        \PY{n}{l} \PY{o}{=} \PY{n}{body}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{o}{.}\PY{n}{label}
+        \PY{n}{jumpback} \PY{o}{=} \PY{n}{findnext}\PY{p}{(}\PY{n}{x}\PY{o}{\PYZhy{}}\PY{o}{\PYZgt{}} \PY{n}{typeof}\PY{p}{(}\PY{n}{x}\PY{p}{)} \PY{o}{==} \PY{n}{GotoNode} \PY{o}{\PYZam{}}\PY{o}{\PYZam{}} \PY{n}{x}\PY{o}{.}\PY{n}{label} \PY{o}{==} \PY{n}{l}\PY{p}{,} \PY{n}{body}\PY{p}{,} \PY{n}{i}\PY{p}{)}
+        \PY{k}{if} \PY{n}{jumpback} \PY{o}{!=} \PY{l+m+mi}{0}
+          \PY{c}{\PYZsh{}println(\PYZdq{}\PYZdl{}i: START LOOP: ends at \PYZdl{}jumpback\PYZdq{})}
+          \PY{n}{push}\PY{err}{!}\PY{p}{(}\PY{n}{loops}\PY{p}{,}\PY{n}{jumpback}\PY{p}{)}
+          \PY{n}{nesting} \PY{o}{+}\PY{o}{=} \PY{l+m+mi}{1}
+        \PY{n}{end}
+      \PY{n}{end}
+
+      \PY{k}{if} \PY{n}{nesting} \PY{o}{\PYZgt{}} \PY{l+m+mi}{0}
+        \PY{c}{\PYZsh{}if typeof(body[i]) == Expr}
+        \PY{c}{\PYZsh{}  println(\PYZdq{}\PYZdl{}i: \PYZbs{}t\PYZdq{}, body[i])}
+        \PY{c}{\PYZsh{}elseif typeof(body[i]) == LabelNode || typeof(body[i]) == GotoNode}
+        \PY{c}{\PYZsh{}  println(\PYZdq{}\PYZdl{}i: \PYZdq{}, typeof(body[i]), \PYZdq{} \PYZdq{}, body[i].label)}
+        \PY{c}{\PYZsh{}elseif typeof(body[i]) != LineNumberNode}
+        \PY{c}{\PYZsh{}  println(\PYZdq{}\PYZdl{}i: \PYZdq{}, typeof(body[i]))}
+        \PY{c}{\PYZsh{}end}
+        \PY{n}{push}\PY{err}{!}\PY{p}{(}\PY{n}{lines}\PY{p}{,}\PY{p}{(}\PY{n}{i}\PY{p}{,}\PY{n}{body}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{)}\PY{p}{)}
+      \PY{n}{end}
+
+      \PY{k}{if} \PY{n}{typeof}\PY{p}{(}\PY{n}{body}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{)} \PY{o}{==} \PY{n}{GotoNode} \PY{o}{\PYZam{}}\PY{o}{\PYZam{}} \PY{o+ow}{in}\PY{p}{(}\PY{n}{i}\PY{p}{,}\PY{n}{loops}\PY{p}{)}
+        \PY{n}{splice}\PY{err}{!}\PY{p}{(}\PY{n}{loops}\PY{p}{,}\PY{n}{findfirst}\PY{p}{(}\PY{n}{loops}\PY{p}{,}\PY{n}{i}\PY{p}{)}\PY{p}{)}
+        \PY{n}{nesting} \PY{o}{\PYZhy{}}\PY{o}{=} \PY{l+m+mi}{1}
+        \PY{c}{\PYZsh{}println(\PYZdq{}\PYZdl{}i: END LOOP: jumps to \PYZdq{},body[i].label)}
+      \PY{n}{end}
+    \PY{n}{end}
+    \PY{n}{lines}
+  \PY{n}{end}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}34{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}loopcontents (generic function with 1 method)\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}35{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+  \PY{n}{function} \PY{n}{find\PYZus{}loose\PYZus{}types}\PY{p}{(}\PY{n}{arr}\PY{p}{:}\PY{p}{:}\PY{n}{Vector}\PY{p}{)}
+    \PY{n}{lines} \PY{o}{=} \PY{n}{ASCIIString}\PY{p}{[}\PY{p}{]}
+    \PY{k}{for} \PY{p}{(}\PY{n}{i}\PY{p}{,}\PY{n}{e}\PY{p}{)} \PY{o+ow}{in} \PY{n}{arr}
+      \PY{k}{if} \PY{n}{typeof}\PY{p}{(}\PY{n}{e}\PY{p}{)} \PY{o}{==} \PY{n}{Expr}
+        \PY{n}{es} \PY{o}{=} \PY{n}{copy}\PY{p}{(}\PY{n}{e}\PY{o}{.}\PY{n}{args}\PY{p}{)}
+        \PY{k}{while} \PY{err}{!}\PY{n}{isempty}\PY{p}{(}\PY{n}{es}\PY{p}{)}
+          \PY{n}{e1} \PY{o}{=} \PY{n}{pop}\PY{err}{!}\PY{p}{(}\PY{n}{es}\PY{p}{)}
+          \PY{k}{if} \PY{n}{typeof}\PY{p}{(}\PY{n}{e1}\PY{p}{)} \PY{o}{==} \PY{n}{Expr}
+            \PY{n}{append}\PY{err}{!}\PY{p}{(}\PY{n}{es}\PY{p}{,}\PY{n}{e1}\PY{o}{.}\PY{n}{args}\PY{p}{)}
+          \PY{n}{elseif} \PY{n}{typeof}\PY{p}{(}\PY{n}{e1}\PY{p}{)} \PY{o}{==} \PY{n}{SymbolNode} \PY{o}{\PYZam{}}\PY{o}{\PYZam{}} \PY{err}{!}\PY{n}{isleaftype}\PY{p}{(}\PY{n}{e1}\PY{o}{.}\PY{n}{typ}\PY{p}{)} \PY{o}{\PYZam{}}\PY{o}{\PYZam{}} \PY{n}{typeof}\PY{p}{(}\PY{n}{e1}\PY{o}{.}\PY{n}{typ}\PY{p}{)} \PY{o}{==} \PY{n}{UnionType}
+            \PY{n}{push}\PY{err}{!}\PY{p}{(}\PY{n}{lines}\PY{p}{,}\PY{l+s}{\PYZdq{}}\PY{l+s+se}{\PYZbs{}t}\PY{l+s+se}{\PYZbs{}t}\PY{l+s}{\PYZdl{}i: \PYZdl{}(e1.name): \PYZdl{}(e1.typ)}\PY{l+s}{\PYZdq{}}\PY{p}{)}
+          \PY{n}{end} 
+        \PY{n}{end}                          
+      \PY{n}{end}
+    \PY{n}{end}
+    \PY{n}{isempty}\PY{p}{(}\PY{n}{lines}\PY{p}{)} \PY{err}{?} \PY{n}{lines} \PY{p}{:} \PY{n}{unshift}\PY{err}{!}\PY{p}{(}\PY{n}{lines}\PY{p}{,}\PY{l+s}{\PYZdq{}}\PY{l+s}{\PYZdq{}}\PY{p}{)}
+  \PY{n}{end}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}35{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}find\_loose\_types (generic function with 1 method)\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+\part{Statically Detecting \texttt{NoMethodError}s}The most obviously useful kind of type checking in Julia is to prevent
+``No Method Error''s. This presents a challenge: methods are often added
+to generic functions after the fact in Julia, so this checking must be
+done with as much awareness as possible of the environment in which the
+call will be made in order to avoid false positives.I have not yet implemented this because I don't know how to get into the
+proper context to make the check. I could write first version which
+ignores this problem.
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}36{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n+nb}{type} \PY{n}{CallSignature}
+  \PY{n}{name}\PY{p}{:}\PY{p}{:}\PY{n}{Symbol}
+  \PY{n}{argtypes}\PY{p}{:}\PY{p}{:}\PY{n}{Array}\PY{p}{\PYZob{}}\PY{n}{DataType}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{\PYZcb{}}
+\PY{n}{end}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}37{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{function} \PY{n}{find\PYZus{}no\PYZus{}method\PYZus{}errors}\PY{p}{(}\PY{n}{args}\PY{o}{.}\PY{o}{.}\PY{o}{.}\PY{p}{;}\PY{n}{mod}\PY{o}{=}\PY{n+nb+bp}{None}\PY{p}{)}
+  \PY{n}{callsigs} \PY{o}{=} \PY{n}{find\PYZus{}method\PYZus{}calls}\PY{p}{(}\PY{n}{args}\PY{o}{.}\PY{o}{.}\PY{o}{.}\PY{p}{)}
+  \PY{n}{output} \PY{o}{=} \PY{p}{(}\PY{n}{Function}\PY{p}{,}\PY{n}{CallSignature}\PY{p}{)}\PY{p}{[}\PY{p}{]}
+  \PY{k}{for} \PY{n}{callsig} \PY{o+ow}{in} \PY{n}{callsigs}
+    \PY{n}{f} \PY{o}{=} \PY{n}{mod} \PY{o}{==} \PY{n+nb+bp}{None} \PY{err}{?} \PY{n+nb}{eval}\PY{p}{(}\PY{n}{callsig}\PY{o}{.}\PY{n}{name}\PY{p}{)} \PY{p}{:} \PY{n+nb}{eval}\PY{p}{(}\PY{n}{mod}\PY{p}{,}\PY{n}{callsig}\PY{o}{.}\PY{n}{name}\PY{p}{)}
+    \PY{n}{options} \PY{o}{=} \PY{n}{methods}\PY{p}{(}\PY{n}{f}\PY{p}{,}\PY{n+nb}{tuple}\PY{p}{(}\PY{n}{callsig}\PY{o}{.}\PY{n}{argtypes}\PY{o}{.}\PY{o}{.}\PY{o}{.}\PY{p}{)}\PY{p}{)}
+    \PY{k}{if} \PY{n}{length}\PY{p}{(}\PY{n}{options}\PY{p}{)} \PY{o}{==} \PY{l+m+mi}{0}
+      \PY{n}{push}\PY{err}{!}\PY{p}{(}\PY{n}{output}\PY{p}{,}\PY{p}{(}\PY{n}{f}\PY{p}{,}\PY{n}{callsig}\PY{p}{)}\PY{p}{)}
+    \PY{n}{end}
+  \PY{n}{end}
+  \PY{n}{output}
+\PY{n}{end}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}37{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}find\_no\_method\_errors (generic function with 1 method)\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}38{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{function} \PY{n}{find\PYZus{}method\PYZus{}calls}\PY{p}{(}\PY{n}{args}\PY{o}{.}\PY{o}{.}\PY{o}{.}\PY{p}{)}
+  \PY{n}{e} \PY{o}{=} \PY{n}{code\PYZus{}typed}\PY{p}{(}\PY{n}{args}\PY{o}{.}\PY{o}{.}\PY{o}{.}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}
+  \PY{n}{body} \PY{o}{=} \PY{n}{e}\PY{o}{.}\PY{n}{args}\PY{p}{[}\PY{l+m+mi}{3}\PY{p}{]}\PY{o}{.}\PY{n}{args}
+  \PY{n}{lines} \PY{o}{=} \PY{n}{CallSignature}\PY{p}{[}\PY{p}{]}
+  \PY{k}{for} \PY{n}{b} \PY{o+ow}{in} \PY{n}{body}
+    \PY{k}{if} \PY{n}{typeof}\PY{p}{(}\PY{n}{b}\PY{p}{)} \PY{o}{==} \PY{n}{Expr}
+      \PY{k}{if} \PY{n}{b}\PY{o}{.}\PY{n}{head} \PY{o}{==} \PY{p}{:}\PY{k}{return} \PY{c}{\PYZsh{} want to catch function calls nested in a return}
+        \PY{n}{append}\PY{err}{!}\PY{p}{(}\PY{n}{body}\PY{p}{,}\PY{n}{b}\PY{o}{.}\PY{n}{args}\PY{p}{)}
+      \PY{n}{elseif} \PY{n}{b}\PY{o}{.}\PY{n}{head} \PY{o}{==} \PY{p}{:}\PY{n}{call}
+        \PY{k}{if} \PY{n}{typeof}\PY{p}{(}\PY{n}{b}\PY{o}{.}\PY{n}{args}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)} \PY{o}{==} \PY{n}{Symbol}
+          \PY{c}{\PYZsh{}@show b.args, typeof(b.args[3])}
+          \PY{n}{cs} \PY{o}{=} \PY{n}{CallSignature}\PY{p}{(}\PY{n}{b}\PY{o}{.}\PY{n}{args}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{,}\PY{p}{[}\PY{n}{typeof}\PY{p}{(}\PY{n}{e}\PY{p}{)} \PY{o}{==} \PY{n}{Expr} \PY{err}{?} \PY{n}{e}\PY{o}{.}\PY{n}{typ} \PY{p}{:}
+            \PY{n}{typeof}\PY{p}{(}\PY{n}{e}\PY{p}{)} \PY{o}{==} \PY{n}{Symbol} \PY{err}{?} \PY{n}{Any} \PY{p}{:}
+            \PY{n}{typeof}\PY{p}{(}\PY{n}{e}\PY{p}{)} \PY{k}{for} \PY{n}{e} \PY{o+ow}{in} \PY{n}{b}\PY{o}{.}\PY{n}{args}\PY{p}{[}\PY{l+m+mi}{2}\PY{p}{:}\PY{p}{]}\PY{p}{]}\PY{p}{)}
+          \PY{n}{push}\PY{err}{!}\PY{p}{(}\PY{n}{lines}\PY{p}{,}\PY{n}{cs}\PY{p}{)}
+        \PY{n}{end}
+      \PY{n}{end}
+    \PY{n}{end}
+  \PY{n}{end}
+  \PY{n}{lines}
+\PY{n}{end}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}38{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}find\_method\_calls (generic function with 1 method)\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}39{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{function} \PY{n}{aba}\PY{p}{(}\PY{n}{x}\PY{p}{)}
+  \PY{l+m+mi}{2}
+\PY{n}{end}
+\PY{n}{function} \PY{n}{aba}\PY{p}{(}\PY{n}{x}\PY{p}{,}\PY{n}{y}\PY{p}{:}\PY{p}{:}\PY{n}{Float64}\PY{p}{)}
+  \PY{l+m+mf}{3.14}
+\PY{n}{end}
+\PY{n}{function} \PY{n}{foo}\PY{p}{(}\PY{n}{x}\PY{p}{)}
+  \PY{n}{aba}\PY{p}{(}\PY{n}{x}\PY{p}{,}\PY{l+m+mi}{4}\PY{p}{)}
+\PY{n}{end}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}39{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}foo (generic function with 2 methods)\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}42{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{c} \PY{o}{=} \PY{n}{find\PYZus{}no\PYZus{}method\PYZus{}errors}\PY{p}{(}\PY{n}{foo}\PY{p}{,}\PY{p}{(}\PY{n}{Float64}\PY{p}{,}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}42{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}1-element Array\{(Function,CallSignature),1\}:
+ (aba,CallSignature(:aba,[SymbolNode,Int64]))\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}44{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{code\PYZus{}typed}\PY{p}{(}\PY{n}{foo}\PY{p}{,}\PY{p}{(}\PY{n}{Number}\PY{p}{,}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+
+            
+                \vspace{-0.2\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+    
+
+        % If the first block is an image, minipage the image.  Else
+        % request a certain amount of space for the input text.
+        \needspace{4\baselineskip}
+        
+        
+
+            % Add document contents.
+            
+                \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-out-prompt}Out\hspace{4pt}{[}44{]}:\hspace{4pt}}\\*
+                \vspace{-2.55\baselineskip}\begin{InvisibleVerbatim}
+                \vspace{-0.5\baselineskip}
+\begin{alltt}2-element Array\{Any,1\}:
+ :(\$(Expr(:lambda, \{:x\}, \{\{\},\{\{:x,Int64,0\}\},\{\}\}, quote  \# In[12], line
+2:
+        unless top(slt\_int)(5,x::Int64)::Bool goto 0 \# line 3:
+        return x::Int64
+        goto 1
+        0:  \# In[12], line 5:
+        return false
+        1:
+    end)))
+ :(\$(Expr(:lambda, \{:x\}, \{\{\},\{\{:x,Number,0\}\},\{\}\}, quote  \# In[39],
+line 8:
+        return aba(x::Number,4)::None
+    end)))\end{alltt}
+
+            \end{InvisibleVerbatim}
+            
+        
+    
+
+
+    % Make sure that atleast 4 lines are below the HR
+    \needspace{4\baselineskip}
+
+    
+        \vspace{6pt}
+        \makebox[0.1\linewidth]{\smaller\hfill\tt\color{nbframe-in-prompt}In\hspace{4pt}{[}{]}:\hspace{4pt}}\\*
+        \vspace{-2.65\baselineskip}
+        \begin{ColorVerbatim}
+            \vspace{-0.7\baselineskip}
+            \begin{Verbatim}[commandchars=\\\{\}]
+
+\end{Verbatim}
+
+            
+                \vspace{0.3\baselineskip}
+            
+        \end{ColorVerbatim}
+    
+
+        
+
+        \renewcommand{\indexname}{Index}
+        \printindex
+
+    % End of document
+    \end{document}
+
+

@@ -1,0 +1,5 @@
+4-element Array{Any,1}:
+ :( # In[2], line 2:)                                     
+ :(z = top(box)(Int64,top(add_int)(x::Int64,5))::Int64)   
+ :( # line 3:)                                            
+ :(return top(box)(Int64,top(mul_int)(2,z::Int64))::Int64)

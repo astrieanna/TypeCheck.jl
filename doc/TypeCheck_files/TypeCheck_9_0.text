@@ -1,0 +1,5 @@
+1-element Array{Any,1}:
+ :($(Expr(:lambda, {:x}, {{:z},{{:x,Int64,0},{:z,Int64,18}},{}}, quote  # In[2], line 2:
+        z = top(box)(Int64,top(add_int)(x::Int64,5))::Int64 # line 3:
+        return top(box)(Int64,top(mul_int)(2,z::Int64))::Int64
+    end)))

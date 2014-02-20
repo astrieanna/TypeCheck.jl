@@ -1,0 +1,12 @@
+2-element Array{Any,1}:
+ :($(Expr(:lambda, {:x}, {{},{{:x,Int64,0}},{}}, quote  # In[12], line 2:
+        unless top(slt_int)(5,x::Int64)::Bool goto 0 # line 3:
+        return x::Int64
+        goto 1
+        0:  # In[12], line 5:
+        return false
+        1: 
+    end)))
+ :($(Expr(:lambda, {:x}, {{},{{:x,Number,0}},{}}, quote  # In[39], line 8:
+        return aba(x::Number,4)::None
+    end)))                                                                                                                              
