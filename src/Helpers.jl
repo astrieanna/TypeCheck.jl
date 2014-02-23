@@ -3,6 +3,16 @@ function Base.code_typed(f::Function)
   vcat([code_typed(f, tuple([Any for x in 1:l]...)) for l in lengths]...)
 end
 
+function Base.code_typed(m::Method)
+ linfo = m.func.code
+ (tree,ty) = Base.typeinf(linfo,m.sig,())
+ if !isa(tree,Expr)
+     ccall(:jl_uncompress_ast, Any, (Any,Any), linfo, tree)
+  else
+    tree
+  end
+end
+
 function _whos(e::Expr)
   vars = sort(e.args[2][2];by=x->x[1])
   [println("\t",x[1],"\t",x[2]) for x in vars]
