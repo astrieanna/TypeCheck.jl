@@ -1,6 +1,5 @@
 function Base.code_typed(f::Function)
-  lengths = Set(Int64[length(m.sig) for m in f.env]...)
-  vcat([code_typed(f, tuple([Any for x in 1:l]...)) for l in lengths]...)
+  Expr[code_typed(m) for m in f.env]
 end
 
 function Base.code_typed(m::Method)
