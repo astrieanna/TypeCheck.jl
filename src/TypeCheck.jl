@@ -204,8 +204,9 @@ module TypeCheck
 
   function check_method_calls(f::Function;kwargs...)
     calls = MethodCalls[] 
-    for e in code_typed(f)
-      mc = check_method_calls(e;kwargs...)
+    for m in f.env
+      e = code_typed(m)
+      mc = check_method_calls(e,m;kwargs...)
       if !isempty(mc.calls)
         push!(calls, mc)
       end
@@ -213,7 +214,12 @@ module TypeCheck
     FunctionCalls(f.env.name,calls)
   end
 
-  check_method_calls(e::Expr;kwargs...) = no_method_errors(e,method_calls(e);kwargs...)
+  function check_method_calls(e::Expr,m::Method;kwargs...)
+    if Base.arg_decl_parts(m)[3] == symbol("deprecated.jl")
+      CallSignature[]
+    end
+    no_method_errors(e,method_calls(e);kwargs...)
+  end
 
   # Find any methods that match the given CallSignature
   function hasmatches(mod::Module,cs::CallSignature)
