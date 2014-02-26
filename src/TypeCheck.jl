@@ -1,7 +1,8 @@
 # These are some functions to allow static type-checking of Julia programs
 
 module TypeCheck
-  export check_return_types, check_loop_types, check_method_calls
+  export check_return_types, check_loop_types, check_method_calls,
+    methodswithdescendants
 
   include("Helpers.jl")
 

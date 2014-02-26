@@ -120,7 +120,7 @@ function Base.next(t::DataType,arr::Vector{DataType})
 end
 Base.done(t::DataType,arr::Vector{DataType}) = length(arr) == 0
 
-function methodswithsubtypes(t::DataType;onlyleaves::Bool=false,lim::Int=10)
+function methodswithdescendants(t::DataType;onlyleaves::Bool=false,lim::Int=10)
   d = Dict{Symbol,Int}()
   count = 0
   for s in t
