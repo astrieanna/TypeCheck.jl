@@ -111,3 +111,31 @@ argtype(n::Number,e::Expr) = typeof(n)
 argtype(c::Char,e::Expr) = typeof(c)
 argtype(s::String,e::Expr) = typeof(s)
 argtype(i,e::Expr) = typeof(i)
+
+Base.start(t::DataType) = [t]
+function Base.next(t::DataType,arr::Vector{DataType})
+  c = pop!(arr)
+  append!(arr,[x for x in subtypes(c)])
+  (c,arr)
+end
+Base.done(t::DataType,arr::Vector{DataType}) = length(arr) == 0
+
+function methodswithsubtypes(t::DataType;onlyleaves::Bool=false,lim::Int=10)
+  d = Dict{Symbol,Int}()
+  count = 0
+  for s in t
+    if !onlyleaves || (onlyleaves && isleaftype(s))
+      count += 1
+      fs = Set{Symbol}()
+      for m in methodswith(s)
+        push!(fs,m.func.code.name)
+      end
+      for sym in fs
+        d[sym] = get(d,sym,0) + 1
+      end
+    end
+  end
+  l = [(k,v/count) for (k,v) in d]
+  sort!(l,by=(x->x[2]),rev=true)
+  l[1:min(lim,end)]
+end
