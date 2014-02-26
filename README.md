@@ -129,6 +129,66 @@ julia> whos(xyz)
 	z	Any
 ~~~
 
+####`methodswithdescendants(t::DataType;onlyleaves::Bool=false,lim::Int=10)
+
+This method goes through the descendents of a given type and finds what methods are implemented for them. It returns a list of (Symbol,Float64) tuples, where the Symbol is the name of a function and the Float64 is the percentage of subtypes whose `methodswith` shows a result for that function.
+
+Here's an example of call it:
+~~~julia
+julia> using TypeCheck
+
+julia> methodswithdescendants(Real)
+10-element Array{(Symbol,Float64),1}:
+ (:<,0.9166666666666666)      
+ (:convert,0.9166666666666666)
+ (:<=,0.9166666666666666)     
+ (:+,0.75)                    
+ (:-,0.7083333333333334)      
+ (:*,0.6666666666666666)      
+ (:~,0.5833333333333334)      
+ (:|,0.5833333333333334)      
+ (:&,0.5833333333333334)      
+ (:$,0.5833333333333334)      
+
+julia> methodswithdescendants(Real;onlyleaves=true)
+10-element Array{(Symbol,Float64),1}:
+ (:<,1.0)                   
+ (:convert,1.0)             
+ (:<=,1.0)                  
+ (:~,0.7647058823529411)    
+ (:bswap,0.7647058823529411)
+ (:|,0.7647058823529411)    
+ (:&,0.7647058823529411)    
+ (:$,0.7647058823529411)    
+ (:>>,0.7058823529411765)   
+ (:>>>,0.7058823529411765)  
+
+julia> methodswithdescendants(Real;onlyleaves=true,lim=20)
+20-element Array{(Symbol,Float64),1}:
+ (:<,1.0)                            
+ (:convert,1.0)                      
+ (:<=,1.0)                           
+ (:~,0.7647058823529411)             
+ (:bswap,0.7647058823529411)         
+ (:|,0.7647058823529411)             
+ (:&,0.7647058823529411)             
+ (:$,0.7647058823529411)             
+ (:>>,0.7058823529411765)            
+ (:>>>,0.7058823529411765)           
+ (:<<,0.7058823529411765)            
+ (:*,0.6470588235294118)             
+ (:count_ones,0.6470588235294118)    
+ (:-,0.6470588235294118)             
+ (:+,0.6470588235294118)             
+ (:trailing_zeros,0.6470588235294118)
+ (:leading_zeros,0.5882352941176471) 
+ (:signbit,0.5882352941176471)       
+ (:^,0.4117647058823529)             
+ (:rem,0.4117647058823529)
+~~~
+
+
+
 ### Other Ways to Run Checks
 If you want to run these only on a single method, you can get the `Expr` for the method from `code_typed` and then pass that into the check you would like to run.
 
