@@ -10,7 +10,7 @@ Running a check on a function checks each method; running a check on a module ch
 ### `check_return_types`: do the return types of your functions depend on the types, not the values of your arguments?
 
 It is considered good style in Julia to have the return type of functions depend only on their argument types, not on the argument values.
-This function trys to check that you did so.
+This function tries to check that you did so.
 
 You can run this on a generic function or on a module:
 * `check_return_types(istext)`
@@ -37,7 +37,7 @@ julia> check_return_types(foo2)
 ~~~
 
 Additionally, it does a check to see if the return type of the function depends on a function call in the return statement.
-This prevents the analysis from complaining about every function that calls a "bad" functions.
+This prevents the analysis from complaining about every function that calls a "bad" function.
 However, it's possible that this silences too many alerts.
 
 ### `check_loop_types`: do the variables in your loops have stable types?
@@ -96,7 +96,7 @@ julia> check_loop_types(barr3)
 (`barr3()` will throw an error rather than actually making `x` a `Float64`.)
 
 
-It is possible that it misses lose types in some cases, but I am not currently aware of them. Please let me know if you find one.
+It is possible that it misses loop types in some cases, but I am not currently aware of them. Please let me know if you find one.
 
 ### `check_method_calls`: could your functions have run-time NoMethodErrors?
 
