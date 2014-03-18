@@ -96,7 +96,7 @@ julia> check_loop_types(barr3)
 (`barr3()` will throw an error rather than actually making `x` a `Float64`.)
 
 
-It is possible that it misses loop types in some cases, but I am not currently aware of them. Please let me know if you find one.
+It is possible that it misses loose types in some cases, but I am not currently aware of them. Please let me know if you find one.
 
 ### `check_method_calls`: could your functions have run-time NoMethodErrors?
 
