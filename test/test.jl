@@ -67,6 +67,7 @@ module TestTypeCheck
       end
       return x
     end
+    @show check_loop_types(f1)
     check_loops(f1,failed)
   end
 
