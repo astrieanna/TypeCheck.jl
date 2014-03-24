@@ -119,7 +119,7 @@ module TypeCheck
   end
 
   check_loop_types(e::Expr;kwargs...) = loosetypes(e,loopcontents(e))
-  
+ 
   # This is a function for trying to detect loops in a method of a generic function
   # Returns lines that are inside one or more loops
   function loopcontents(e)
@@ -130,7 +130,9 @@ module TypeCheck
     for i in 1:length(b)
       if typeof(b[i]) == LabelNode
         l = b[i].label
-        jumpback = findnext(x-> typeof(x) == GotoNode && x.label == l, b, i)
+        jumpback = findnext(
+          x-> (typeof(x) == GotoNode && x.label == l) || (Base.is_expr(x,:gotoifnot) && x.args[end] == l),
+          b, i)
         if jumpback != 0
           push!(loops,jumpback)
           nesting += 1
