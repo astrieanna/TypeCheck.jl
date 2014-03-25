@@ -40,7 +40,7 @@ call_info(call::Expr) = (call.args[1], AType[expr_type(e) for e in call.args[2:e
 
 function signature(e::Expr)
   r = returntype(e) 
- "($(string_of_argtypes(argtypes(e))))::$(r)"
+ "($(string_of_argument_types(argument_types(e))))::$(r)"
 end
   
 function extract_calls_from_returns(e::Expr)
@@ -52,13 +52,13 @@ end
 AType = Union(Type,TypeVar)
 
 # for a function, get the types of each of the arguments in the signature
-function argtypes(e::Expr)
+function argument_types(e::Expr)
   argnames = Symbol[typeof(x) == Symbol ? x : x.args[1] for x in e.args[1]]
   argtuples = filter(x->x[1] in argnames, e.args[2][2]) #only arguments, no local vars
   AType[t[2] for t in argtuples]
 end
 
-function string_of_argtypes(arr::Vector{AType})
+function string_of_argument_types(arr::Vector{AType})
   join([string(a) for a in arr],",")
 end
 
@@ -170,8 +170,8 @@ type MethodSignature
   typs::Vector{AType}
   returntype::Union(Type,TypeVar) # v0.2 has TypeVars as returntypes; v0.3 does not
 end
-MethodSignature(e::Expr) = MethodSignature(argtypes(e),returntype(e))
-Base.writemime(io, ::MIME"text/plain", x::MethodSignature) = println(io,"(",string_of_argtypes(x.typs),")::",x.returntype)
+MethodSignature(e::Expr) = MethodSignature(argument_types(e),returntype(e))
+Base.writemime(io, ::MIME"text/plain", x::MethodSignature) = println(io,"(",string_of_argument_types(x.typs),")::",x.returntype)
 
 ## Checking that return values are base only on input *types*, not values.
 
@@ -198,13 +198,13 @@ end
 
 function check_return_type(e::Expr;kwargs...)
   (typ,b) = isreturnbasedonvalues(e;kwargs...)
-  (MethodSignature(argtypes(e),typ),b)
+  (MethodSignature(argument_types(e),typ),b)
 end
  
 # Determine whether this method's return type might change based on input values rather than input types
 function isreturnbasedonvalues(e::Expr;mod=Base)
   rt = returntype(e)
-  ts = argtypes(e)
+  ts = argument_types(e)
   if isleaftype(rt) || rt == None return (rt,false) end
 
   for t in ts
@@ -314,9 +314,9 @@ end
 
 type CallSignature
   name::Symbol
-  argtypes::Vector{AType}
+  argument_types::Vector{AType}
 end
-Base.writemime(io, ::MIME"text/plain", x::CallSignature) = println(io,string(x.name),"(",string_of_argtypes(x.argtypes),")")
+Base.writemime(io, ::MIME"text/plain", x::CallSignature) = println(io,string(x.name),"(",string_of_argument_types(x.argument_types),")")
 
 type MethodCalls
   m::MethodSignature
@@ -367,7 +367,7 @@ function hasmatches(mod::Module,cs::CallSignature)
   if isdefined(mod,cs.name)
     f = eval(mod,cs.name)
     if isgeneric(f)
-      opts = methods(f,tuple(cs.argtypes...))
+      opts = methods(f,tuple(cs.argument_types...))
       if isempty(opts)
         return false
       end
