@@ -160,6 +160,10 @@ function check_all_module(m::Module;test=check_return_types,kwargs...)
   println("The total number of failed methods in $m is $score")
 end
 
+check_return_types(m::Module;kwargs...) = check_all_module(m;test=check_return_types,kwargs...)
+check_loop_types(m::Module) = check_all_module(m;test=check_loop_types)
+check_method_calls(m::Module) = check_all_module(m;test=check_method_calls)
+
 type MethodSignature
   typs::Vector{AType}
   returntype::Union(Type,TypeVar) # v0.2 has TypeVars as returntypes; v0.3 does not
@@ -180,8 +184,6 @@ function Base.writemime(io, ::MIME"text/plain", x::FunctionSignature)
     display(m)
   end
 end
-
-check_return_types(m::Module;kwargs...) = check_all_module(m;test=check_return_types,kwargs...)
 
 function check_return_types(f::Function;kwargs...)
   results = MethodSignature[]
@@ -245,8 +247,6 @@ function Base.writemime(io, ::MIME"text/plain", x::LoopResults)
     display(lr)
   end
 end
-
-check_loop_types(m::Module) = check_all_module(m;test=check_loop_types)
 
 function check_loop_types(f::Function;kwargs...)
   lrs = LoopResult[]
@@ -340,8 +340,6 @@ function Base.writemime(io, ::MIME"text/plain", x::FunctionCalls)
     display(mc)
   end
 end
-
-check_method_calls(m::Module) = check_all_module(m;test=check_method_calls)
 
 function check_method_calls(f::Function;kwargs...)
   calls = MethodCalls[] 
