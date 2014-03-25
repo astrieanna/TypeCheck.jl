@@ -15,18 +15,15 @@ function Base.code_typed(m::Method)
      ccall(:jl_uncompress_ast, Any, (Any,Any), linfo, tree)
   else
     tree
-  end
-end
-
-function _whos(e::Expr)
-  vars = sort(e.args[2][2];by=x->x[1])
-  [println("\t",x[1],"\t",x[2]) for x in vars]
+ end
 end
 
 function Base.whos(f,args...)
   for e in code_typed(f,args...)
     println(signature(e))
-    _whos(e)                                
+    for x in sort(e.args[2][2];by=x->x[1])
+      println("\t",x[1],"\t",x[2])
+    end
     println("")
   end
 end
