@@ -22,6 +22,8 @@ function Base.code_typed(m::Method)
  end
 end
 
+# specify a method via a method, function, or function+argument-type-tuple
+# prints out the local variables of that method, and their types
 function Base.whos(f,args...)
   for e in code_typed(f,args...)
     println(signature(e))
@@ -33,31 +35,46 @@ function Base.whos(f,args...)
 end
 
 ## Basic Operations on Function Exprs
+
+# given an Expr representing a method, return its inferred return type
 returntype(e::Expr) =  e.args[3].typ
+
+# given an Expr representing a method, return an Array of Exprs representing its body
 body(e::Expr) = e.args[3].args
+
+# given an Expr representing a method, return all of the return statement in its body
 returns(e::Expr) = filter(x-> typeof(x) == Expr && x.head==:return,body(e))
+
+# given an Expr representing a function call, return a tuple containing:
+# 1) the name of the called function (::Symbol)
+# 2) the types of the arguments it is being called with (::Array{AType,1})
 call_info(call::Expr) = (call.args[1], AType[expr_type(e) for e in call.args[2:end]])
 
+# given an Expr representing a method, pretty print the method signature
 function signature(e::Expr)
   r = returntype(e) 
  "($(string_of_argument_types(argument_types(e))))::$(r)"
 end
-  
+
+# given an Expr representing a method,
+# return all function all Exprs contained in return statements in the method body
 function extract_calls_from_returns(e::Expr)
   rs = returns(e)
   rs_with_calls = filter(x->typeof(x.args[1]) == Expr && x.args[1].head == :call,rs)
   Expr[expr.args[1] for expr in rs_with_calls]
 end
 
+# A type that covers both Types and TypeVars
 AType = Union(Type,TypeVar)
 
-# for a function, get the types of each of the arguments in the signature
+# given an Expr representing a method, get the type of each of the arguments in the signature
 function argument_types(e::Expr)
   argnames = Symbol[typeof(x) == Symbol ? x : x.args[1] for x in e.args[1]]
   argtuples = filter(x->x[1] in argnames, e.args[2][2]) #only arguments, no local vars
   AType[t[2] for t in argtuples]
 end
 
+# pretty print an array of types (usually the output of argument_types)
 function string_of_argument_types(arr::Vector{AType})
   join([string(a) for a in arr],",")
 end
