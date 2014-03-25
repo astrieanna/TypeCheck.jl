@@ -4,16 +4,20 @@ module TypeCheck
 export check_return_types, check_loop_types, check_method_calls,
   methodswithdescendants
 
+## Modifying functions from Base
+
+# return the type-inferred AST for each method of a generic function
 function Base.code_typed(f::Function)
   Expr[code_typed(m) for m in f.env]
 end
 
+# return the type-inferred AST for one method of a generic function
 function Base.code_typed(m::Method)
  linfo = m.func.code
  (tree,ty) = Base.typeinf(linfo,m.sig,())
  if !isa(tree,Expr)
      ccall(:jl_uncompress_ast, Any, (Any,Any), linfo, tree)
-  else
+ else
     tree
  end
 end
@@ -28,6 +32,7 @@ function Base.whos(f,args...)
   end
 end
 
+## Basic Operations on Function Exprs
 returntype(e::Expr) =  e.args[3].typ
 body(e::Expr) = e.args[3].args
 returns(e::Expr) = filter(x-> typeof(x) == Expr && x.head==:return,body(e))
