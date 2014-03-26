@@ -26,7 +26,7 @@ end
 # prints out the local variables of that method, and their types
 function Base.whos(f,args...)
   for e in code_typed(f,args...)
-    println(signature(e))
+    display(MethodSignature(e))
     for x in sort(e.args[2][2];by=x->x[1])
       println("\t",x[1],"\t",x[2])
     end
@@ -45,12 +45,6 @@ body(e::Expr) = e.args[3].args
 # given an Expr representing a method, return all of the return statement in its body
 returns(e::Expr) = filter(x-> typeof(x) == Expr && x.head==:return,body(e))
 
-# given an Expr representing a method, pretty print the method signature
-function signature(e::Expr)
-  r = returntype(e) 
- "($(string_of_argumenttypes(argumenttypes(e))))::$(r)"
-end
-
 # given an Expr representing a method,
 # return all function all Exprs contained in return statements in the method body
 function extract_calls_from_returns(e::Expr)
@@ -67,11 +61,6 @@ function argumenttypes(e::Expr)
   argnames = Symbol[typeof(x) == Symbol ? x : x.args[1] for x in e.args[1]]
   argtuples = filter(x->x[1] in argnames, e.args[2][2]) #only arguments, no local vars
   AType[t[2] for t in argtuples]
-end
-
-# pretty print an array of types (usually the output of argumenttypes)
-function string_of_argumenttypes(arr::Vector{AType})
-  join([string(a) for a in arr],",")
 end
 
 # given an Expr, determine if it is calling a TopNode
@@ -207,7 +196,9 @@ type MethodSignature
   returntype::Union(Type,TypeVar) # v0.2 has TypeVars as returntypes; v0.3 does not
 end
 MethodSignature(e::Expr) = MethodSignature(argumenttypes(e),returntype(e))
-Base.writemime(io, ::MIME"text/plain", x::MethodSignature) = println(io,"(",string_of_argumenttypes(x.typs),")::",x.returntype)
+function Base.writemime(io, ::MIME"text/plain", x::MethodSignature)
+  println(io,"(",join([string(t) for t in x.typs],","),")::",x.returntype)
+end
 
 type FunctionSignature
   methods::Vector{MethodSignature}
@@ -363,7 +354,9 @@ type CallSignature
   name::Symbol
   argumenttypes::Vector{AType}
 end
-Base.writemime(io, ::MIME"text/plain", x::CallSignature) = println(io,string(x.name),"(",string_of_argumenttypes(x.argumenttypes),")")
+function Base.writemime(io, ::MIME"text/plain", x::CallSignature)
+  println(io,string(x.name),"(",join([string(t) for t in x.argumenttypes],","),")")
+end
 
 type MethodCalls
   m::MethodSignature
