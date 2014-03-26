@@ -45,11 +45,6 @@ body(e::Expr) = e.args[3].args
 # given an Expr representing a method, return all of the return statement in its body
 returns(e::Expr) = filter(x-> typeof(x) == Expr && x.head==:return,body(e))
 
-# given an Expr representing a function call, return a tuple containing:
-# 1) the name of the called function (::Symbol)
-# 2) the types of the arguments it is being called with (::Array{AType,1})
-call_info(call::Expr) = (call.args[1], AType[expr_type(e) for e in call.args[2:end]])
-
 # given an Expr representing a method, pretty print the method signature
 function signature(e::Expr)
   r = returntype(e) 
