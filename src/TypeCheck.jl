@@ -416,7 +416,7 @@ function check_method_calls(e::Expr,m::Method;kwargs...)
   if Base.arg_decl_parts(m)[3] == symbol("deprecated.jl")
     CallSignature[]
   end
-  nomethoderrors(e,method_calls(e);kwargs...)
+  nomethoderrors(e,methodcalls(e);kwargs...)
 end
 
 # Find any methods that match the given CallSignature
@@ -447,7 +447,7 @@ function nomethoderrors(e::Expr,cs::Vector{CallSignature};mod=Base)
 end
 
 # Look through the body of the function for `:call`s
-function method_calls(e::Expr)
+function methodcalls(e::Expr)
   b = body(e)
   lines = CallSignature[]
   for s in b
