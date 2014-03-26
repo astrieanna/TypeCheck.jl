@@ -79,7 +79,11 @@ function string_of_argument_types(arr::Vector{AType})
   join([string(a) for a in arr],",")
 end
 
+# given an Expr, determine if it is calling a TopNode
+# (this affects how we should handle resolving the callee name)
 is_top(e) = Base.is_expr(e,:call) && typeof(e.args[1]) == TopNode
+
+# given a call Expr (:call, :call1, :new), determine its return type
 function returntype(e::Expr,context::Expr) #must be :call,:new,:call1
   if Base.is_expr(e,:new); return e.typ; end
   if Base.is_expr(e,:call1) && isa(e.args[1], TopNode); return e.typ; end
@@ -104,7 +108,7 @@ function returntype(e::Expr,context::Expr) #must be :call,:new,:call1
       if !isa(f,Function) || !isgeneric(f)
         return e.typ
       end
-      fargtypes = tuple([argtype(ea,context) for ea in e.args[2:end]])
+      fargtypes = tuple([argument_type(ea,context) for ea in e.args[2:end]])
       return Union([returntype(ef) for ef in code_typed(f,fargtypes)]...)
     else
       return @show e.typ
@@ -114,7 +118,9 @@ function returntype(e::Expr,context::Expr) #must be :call,:new,:call1
   return e.typ
 end
 
-function argtype(e::Expr,context::Expr)
+# for an Expr `e` used as an argument to a call in function Expr `context`,
+# determine the type of `e`
+function argument_type(e::Expr,context::Expr)
  if Base.is_expr(e,:call) || Base.is_expr(e,:new) || Base.is_expr(e,:call1)
    return returntype(e,context)
  end
@@ -122,21 +128,30 @@ function argtype(e::Expr,context::Expr)
  @show e
  return Any
 end
-function argtype(s::Symbol,e::Expr)
+
+# for a Symbol `s` used as an argument to a call in a function Expr `e`,
+# determine the type of `s`.
+function argument_type(s::Symbol,e::Expr)
   vartypes = [x[1] => x[2] for x in e.args[2][2]]
   s in vartypes ? (vartypes[@show s]) : Any
 end
-argtype(s::SymbolNode,e::Expr) = s.typ
-argtype(t::TopNode,e::Expr) = Any
-argtype(l::LambdaStaticData,e::Expr) = Function
-argtype(q::QuoteNode,e::Expr) = argtype(q.value,e)
 
-#TODO: how to deal with immediate values
-argtype(n::Number,e::Expr) = typeof(n)
-argtype(c::Char,e::Expr) = typeof(c)
-argtype(s::String,e::Expr) = typeof(s)
-argtype(i,e::Expr) = typeof(i)
+# as above, but for different call argument types
+argument_type(s::SymbolNode,e::Expr) = s.typ
+argument_type(t::TopNode,e::Expr) = Any
+argument_type(l::LambdaStaticData,e::Expr) = Function
+argument_type(q::QuoteNode,e::Expr) = argument_type(q.value,e)
 
+# as above, but for various literal values
+argument_type(n::Number,e::Expr) = typeof(n)
+argument_type(c::Char,e::Expr) = typeof(c)
+argument_type(s::String,e::Expr) = typeof(s)
+argument_type(i,e::Expr) = typeof(i) #catch all, hopefully for more literals
+
+# start, next, and done are the functions for-loops use to iterate
+# having implementations of them makes a type iterable
+# this defines iterating over a DataType to mean iterating over its descendants
+# (breadth-first-search ordering)
 Base.start(t::DataType) = [t]
 function Base.next(t::DataType,arr::Vector{DataType})
   c = pop!(arr)
@@ -145,6 +160,12 @@ function Base.next(t::DataType,arr::Vector{DataType})
 end
 Base.done(t::DataType,arr::Vector{DataType}) = length(arr) == 0
 
+# this is like the `methodswith` function from Base,
+# but it considers all descendants of the type
+# rather than the type itself (or the type + super types)
+# it produces a list of function names and statistics
+# about how many descendants implement that function
+# this is good for discovering implicit interfaces
 function methodswithdescendants(t::DataType;onlyleaves::Bool=false,lim::Int=10)
   d = Dict{Symbol,Int}()
   count = 0
@@ -179,9 +200,12 @@ function check_all_module(m::Module;test=check_return_types,kwargs...)
   println("The total number of failed methods in $m is $score")
 end
 
+# use check_all_module to implement the Module version of other checks
 check_return_types(m::Module;kwargs...) = check_all_module(m;test=check_return_types,kwargs...)
 check_loop_types(m::Module) = check_all_module(m;test=check_loop_types)
 check_method_calls(m::Module) = check_all_module(m;test=check_method_calls)
+
+## Checking that return values are base only on input *types*, not values.
 
 type MethodSignature
   typs::Vector{AType}
@@ -189,8 +213,6 @@ type MethodSignature
 end
 MethodSignature(e::Expr) = MethodSignature(argument_types(e),returntype(e))
 Base.writemime(io, ::MIME"text/plain", x::MethodSignature) = println(io,"(",string_of_argument_types(x.typs),")::",x.returntype)
-
-## Checking that return values are base only on input *types*, not values.
 
 type FunctionSignature
   methods::Vector{MethodSignature}
@@ -204,6 +226,7 @@ function Base.writemime(io, ::MIME"text/plain", x::FunctionSignature)
   end
 end
 
+# given a function, run check_return_types on each method
 function check_return_types(f::Function;kwargs...)
   results = MethodSignature[]
   for e in code_typed(f)
@@ -213,11 +236,16 @@ function check_return_types(f::Function;kwargs...)
   FunctionSignature(results,f.env.name)
 end
 
+# given an Expr representing a Method,
+# determine whether its return type is based
+# only on the arugment types or whether it is
+# also influenced by argument values
+# (the Method fails the check if the return type depends on values)
 function check_return_type(e::Expr;kwargs...)
   (typ,b) = isreturnbasedonvalues(e;kwargs...)
   (MethodSignature(argument_types(e),typ),b)
 end
- 
+
 # Determine whether this method's return type might change based on input values rather than input types
 function isreturnbasedonvalues(e::Expr;mod=Base)
   rt = returntype(e)
@@ -267,6 +295,7 @@ function Base.writemime(io, ::MIME"text/plain", x::LoopResults)
   end
 end
 
+# for a given Function, run check_loop_types on each Method
 function check_loop_types(f::Function;kwargs...)
   lrs = LoopResult[]
   for e in code_typed(f)
@@ -276,11 +305,14 @@ function check_loop_types(f::Function;kwargs...)
   LoopResults(f.env.name,lrs)
 end
 
-check_loop_types(e::Expr;kwargs...) = loosetypes(e,loopcontents(e))
- 
-# This is a function for trying to detect loops in a method of a generic function
+# for an Expr representing a Method,
+# check that the type of each variable used in a loop
+# has a concrete type
+check_loop_types(e::Expr;kwargs...) = LoopResult(MethodSignature(e),loosetypes(loopcontents(e)))
+
+# This is a function for trying to detect loops in the body of a Method
 # Returns lines that are inside one or more loops
-function loopcontents(e)
+function loopcontents(e::Expr)
   b = body(e)
   loops = Int[]
   nesting = 0
@@ -308,8 +340,11 @@ function loopcontents(e)
   lines
 end
 
-# Looks for variables with non-leaf types
-function loosetypes(method::Expr,lr::Vector)
+# given `lr`, a Vector of expressions (Expr + literals, etc)
+# try to find all occurances of a variables in `lr`
+# and determine their types
+# `method` is only used as part of constructing the return type
+function loosetypes(lr::Vector)
   lines = (Symbol,Type)[]
   for (i,e) in lr
     if typeof(e) == Expr
@@ -324,7 +359,7 @@ function loosetypes(method::Expr,lr::Vector)
       end                          
     end
   end
-  return LoopResult(MethodSignature(method),lines)
+  return lines
 end
 
 ## Check method calls
@@ -360,6 +395,8 @@ function Base.writemime(io, ::MIME"text/plain", x::FunctionCalls)
   end
 end
 
+# given a Function, run `check_method_calls` on each Method
+# and collect the results into a FunctionCalls
 function check_method_calls(f::Function;kwargs...)
   calls = MethodCalls[] 
   for m in f.env
@@ -372,6 +409,9 @@ function check_method_calls(f::Function;kwargs...)
   FunctionCalls(f.env.name,calls)
 end
 
+# given an Expr representing a Method,
+# and the Method it represents,
+# check the Method body for calls to non-existant Methods
 function check_method_calls(e::Expr,m::Method;kwargs...)
   if Base.arg_decl_parts(m)[3] == symbol("deprecated.jl")
     CallSignature[]
@@ -416,7 +456,7 @@ function method_calls(e::Expr)
         append!(b, s.args)
       elseif s.head == :call
         if typeof(s.args[1]) == Symbol
-          push!(lines,CallSignature(s.args[1], [argtype(e1,e) for e1 in s.args[2:end]]))
+          push!(lines,CallSignature(s.args[1], [argument_type(e1,e) for e1 in s.args[2:end]]))
         end
       end
     end
