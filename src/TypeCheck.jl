@@ -53,7 +53,7 @@ call_info(call::Expr) = (call.args[1], AType[expr_type(e) for e in call.args[2:e
 # given an Expr representing a method, pretty print the method signature
 function signature(e::Expr)
   r = returntype(e) 
- "($(string_of_argument_types(argument_types(e))))::$(r)"
+ "($(string_of_argumenttypes(argumenttypes(e))))::$(r)"
 end
 
 # given an Expr representing a method,
@@ -68,14 +68,14 @@ end
 AType = Union(Type,TypeVar)
 
 # given an Expr representing a method, get the type of each of the arguments in the signature
-function argument_types(e::Expr)
+function argumenttypes(e::Expr)
   argnames = Symbol[typeof(x) == Symbol ? x : x.args[1] for x in e.args[1]]
   argtuples = filter(x->x[1] in argnames, e.args[2][2]) #only arguments, no local vars
   AType[t[2] for t in argtuples]
 end
 
-# pretty print an array of types (usually the output of argument_types)
-function string_of_argument_types(arr::Vector{AType})
+# pretty print an array of types (usually the output of argumenttypes)
+function string_of_argumenttypes(arr::Vector{AType})
   join([string(a) for a in arr],",")
 end
 
@@ -108,7 +108,7 @@ function returntype(e::Expr,context::Expr) #must be :call,:new,:call1
       if !isa(f,Function) || !isgeneric(f)
         return e.typ
       end
-      fargtypes = tuple([argument_type(ea,context) for ea in e.args[2:end]])
+      fargtypes = tuple([argumenttype(ea,context) for ea in e.args[2:end]])
       return Union([returntype(ef) for ef in code_typed(f,fargtypes)]...)
     else
       return @show e.typ
@@ -120,7 +120,7 @@ end
 
 # for an Expr `e` used as an argument to a call in function Expr `context`,
 # determine the type of `e`
-function argument_type(e::Expr,context::Expr)
+function argumenttype(e::Expr,context::Expr)
  if Base.is_expr(e,:call) || Base.is_expr(e,:new) || Base.is_expr(e,:call1)
    return returntype(e,context)
  end
@@ -131,22 +131,22 @@ end
 
 # for a Symbol `s` used as an argument to a call in a function Expr `e`,
 # determine the type of `s`.
-function argument_type(s::Symbol,e::Expr)
+function argumenttype(s::Symbol,e::Expr)
   vartypes = [x[1] => x[2] for x in e.args[2][2]]
   s in vartypes ? (vartypes[@show s]) : Any
 end
 
 # as above, but for different call argument types
-argument_type(s::SymbolNode,e::Expr) = s.typ
-argument_type(t::TopNode,e::Expr) = Any
-argument_type(l::LambdaStaticData,e::Expr) = Function
-argument_type(q::QuoteNode,e::Expr) = argument_type(q.value,e)
+argumenttype(s::SymbolNode,e::Expr) = s.typ
+argumenttype(t::TopNode,e::Expr) = Any
+argumenttype(l::LambdaStaticData,e::Expr) = Function
+argumenttype(q::QuoteNode,e::Expr) = argumenttype(q.value,e)
 
 # as above, but for various literal values
-argument_type(n::Number,e::Expr) = typeof(n)
-argument_type(c::Char,e::Expr) = typeof(c)
-argument_type(s::String,e::Expr) = typeof(s)
-argument_type(i,e::Expr) = typeof(i) #catch all, hopefully for more literals
+argumenttype(n::Number,e::Expr) = typeof(n)
+argumenttype(c::Char,e::Expr) = typeof(c)
+argumenttype(s::String,e::Expr) = typeof(s)
+argumenttype(i,e::Expr) = typeof(i) #catch all, hopefully for more literals
 
 # start, next, and done are the functions for-loops use to iterate
 # having implementations of them makes a type iterable
@@ -211,8 +211,8 @@ type MethodSignature
   typs::Vector{AType}
   returntype::Union(Type,TypeVar) # v0.2 has TypeVars as returntypes; v0.3 does not
 end
-MethodSignature(e::Expr) = MethodSignature(argument_types(e),returntype(e))
-Base.writemime(io, ::MIME"text/plain", x::MethodSignature) = println(io,"(",string_of_argument_types(x.typs),")::",x.returntype)
+MethodSignature(e::Expr) = MethodSignature(argumenttypes(e),returntype(e))
+Base.writemime(io, ::MIME"text/plain", x::MethodSignature) = println(io,"(",string_of_argumenttypes(x.typs),")::",x.returntype)
 
 type FunctionSignature
   methods::Vector{MethodSignature}
@@ -243,13 +243,13 @@ end
 # (the Method fails the check if the return type depends on values)
 function check_return_type(e::Expr;kwargs...)
   (typ,b) = isreturnbasedonvalues(e;kwargs...)
-  (MethodSignature(argument_types(e),typ),b)
+  (MethodSignature(argumenttypes(e),typ),b)
 end
 
 # Determine whether this method's return type might change based on input values rather than input types
 function isreturnbasedonvalues(e::Expr;mod=Base)
   rt = returntype(e)
-  ts = argument_types(e)
+  ts = argumenttypes(e)
   if isleaftype(rt) || rt == None return (rt,false) end
 
   for t in ts
@@ -366,9 +366,9 @@ end
 
 type CallSignature
   name::Symbol
-  argument_types::Vector{AType}
+  argumenttypes::Vector{AType}
 end
-Base.writemime(io, ::MIME"text/plain", x::CallSignature) = println(io,string(x.name),"(",string_of_argument_types(x.argument_types),")")
+Base.writemime(io, ::MIME"text/plain", x::CallSignature) = println(io,string(x.name),"(",string_of_argumenttypes(x.argumenttypes),")")
 
 type MethodCalls
   m::MethodSignature
@@ -424,7 +424,7 @@ function hasmatches(mod::Module,cs::CallSignature)
   if isdefined(mod,cs.name)
     f = eval(mod,cs.name)
     if isgeneric(f)
-      opts = methods(f,tuple(cs.argument_types...))
+      opts = methods(f,tuple(cs.argumenttypes...))
       if isempty(opts)
         return false
       end
@@ -456,7 +456,7 @@ function methodcalls(e::Expr)
         append!(b, s.args)
       elseif s.head == :call
         if typeof(s.args[1]) == Symbol
-          push!(lines,CallSignature(s.args[1], [argument_type(e1,e) for e1 in s.args[2:end]]))
+          push!(lines,CallSignature(s.args[1], [argumenttype(e1,e) for e1 in s.args[2:end]]))
         end
       end
     end
