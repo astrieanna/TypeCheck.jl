@@ -9,7 +9,7 @@ module TestTypeCheck
         f = eval(Base,n)
         if isgeneric(f) && typeof(f) == Function
           context(string(n)) do
-            @fact TypeCheck.check_return_types(f) => anything # => FunctionSignature([],Symbol)
+            @fact TypeCheck.checkreturntypes(f) => anything # => FunctionSignature([],Symbol)
             [@fact istype(TypeCheck.returntype(e)) => true for e in code_typed(f)]
             [@fact TypeCheck.returntype(e) => istype for e in code_typed(f)]
           end
@@ -22,19 +22,19 @@ module TestTypeCheck
 
   caught(x) = x[2] == true
   notcaught(x) = x[2] == false
-  function check_return(f,check)
+  function checkreturn(f,check)
     @fact length(code_typed(f)) => 1
-    @fact TypeCheck.check_return_type(code_typed(f)[1]) => check
+    @fact TypeCheck.checkreturntype(code_typed(f)[1]) => check
   end
 
   facts("Check Return Types: True Positives") do
     barr(x::Int) = isprime(x) ? x : false
-    check_return(barr, caught)
+    checkreturn(barr, caught)
   end
 
   facts("Check Return Types: False Negatives") do
     foo(x::Any) = isprime(x) ? x : false
-    check_return(foo, notcaught)
+    checkreturn(foo, notcaught)
   end
 
 
@@ -44,7 +44,7 @@ module TestTypeCheck
         f = eval(Base,n)
         if isgeneric(f) && typeof(f) == Function
           context(string(n)) do
-            @fact TypeCheck.check_loop_types(f) => anything # => LoopResults
+            @fact TypeCheck.checklooptypes(f) => anything # => LoopResults
           end
         end
       else
@@ -55,9 +55,9 @@ module TestTypeCheck
 
   passed(x) = isempty(x.methods)
   failed(x) = !passed(x)
-  function check_loops(f,check)
+  function checkloops(f,check)
     @fact length(code_typed(f)) => 1
-    @fact check_loop_types(f) => check
+    @fact checklooptypes(f) => check
   end
 
   facts("Check Loop Types: True Positives") do
@@ -67,7 +67,7 @@ module TestTypeCheck
       end
       return x
     end
-    check_loops(f1,failed)
+    checkloops(f1,failed)
   end
 
   facts("Check Loop Types: True Negatives") do
@@ -78,7 +78,7 @@ module TestTypeCheck
       end
       return x
     end
-    check_loops(g1,passed)
+    checkloops(g1,passed)
     function g2()
       x = 5
       x = 0.2
@@ -87,7 +87,7 @@ module TestTypeCheck
       end
       return x
     end
-    check_loops(g2,passed)
+    checkloops(g2,passed)
   end
 
 
@@ -97,7 +97,7 @@ module TestTypeCheck
         f = eval(Base,n)
         if isgeneric(f) && typeof(f) == Function
           context(string(n)) do
-            @fact TypeCheck.check_method_calls(f) => anything # => FunctionCalls
+            @fact TypeCheck.checkmethodcalls(f) => anything # => FunctionCalls
           end
         end
       else
