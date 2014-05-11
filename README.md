@@ -1,6 +1,7 @@
 TypeCheck.jl
 ============
 [![Build Status](https://travis-ci.org/astrieanna/TypeCheck.jl.png?branch=master)](https://travis-ci.org/astrieanna/TypeCheck.jl)
+[![Coverage Status](https://coveralls.io/repos/astrieanna/TypeCheck.jl/badge.png)](https://coveralls.io/r/astrieanna/TypeCheck.jl)
 
 Type-based static analysis for the Julia programming language.
 
