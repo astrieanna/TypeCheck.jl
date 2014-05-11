@@ -1,17 +1,26 @@
-# These are some functions to allow static type-checking of Julia programs
-
+# A Collection of static analysis functions.
+#
+# These functions implement some static type-checking of Julia programs.
+# There are also other type-related functions to allow human-readable output
+# of things like the types of function-local variables.
 module TypeCheck
 export checkreturntypes, checklooptypes, checkmethodcalls,
   methodswithdescendants
 
 ## Modifying functions from Base
 
-# return the type-inferred AST for each method of a generic function
+# Base.code_typed requires a function and tuple of argument types.
+# It can be more convenient to pass in a Function or Method.
+# A method specifies the same information as a Function + argument types,
+# so the implementation is obvious.
+# For a Function, code_typed should return a list of Expr, on per method.
+
+# Return the type-inferred AST for each method of a generic Function.
 function Base.code_typed(f::Function)
   Expr[code_typed(m) for m in f.env]
 end
 
-# return the type-inferred AST for one method of a generic function
+# Return the type-inferred AST for one Method (of a generic Function)
 function Base.code_typed(m::Method)
  linfo = m.func.code
  (tree,ty) = Base.typeinf(linfo,m.sig,())
@@ -22,8 +31,10 @@ function Base.code_typed(m::Method)
  end
 end
 
-# specify a method via a method, function, or function+argument-type-tuple
-# prints out the local variables of that method, and their types
+# The whos function takes a namespace (a Module or the current one) and
+# prints out the bound names and types (variables, types, functions, consts).
+# I'm adding a version to print out function-local variables.
+# Specify a method via a Method, Function, or Function+argument-type-tuple.
 function Base.whos(f,args...)
   for e in code_typed(f,args...)
     display(MethodSignature(e))
@@ -36,17 +47,19 @@ end
 
 ## Basic Operations on Function Exprs
 
-# given an Expr representing a method, return its inferred return type
+# Return the inferred return of type of an Expr representing a Method
 returntype(e::Expr) =  e.args[3].typ
 
-# given an Expr representing a method, return an Array of Exprs representing its body
+# Return the body of a Method.
+# Takes an Expr representing a Method, returns Vector{Expr}.
 body(e::Expr) = e.args[3].args
 
-# given an Expr representing a method, return all of the return statement in its body
+# Return all of the return statements in the body of a Method
+# Takes an Expr representing a Method, return Vector{Expr}
 returns(e::Expr) = filter(x-> typeof(x) == Expr && x.head==:return,body(e))
 
-# given an Expr representing a method,
-# return all function all Exprs contained in return statements in the method body
+# Returns all function calls contained in return statements in the body of a Method.
+# Takes an Expr representing a Method, returns Vector{Expr}
 function extractcallsfromreturns(e::Expr)
   rs = returns(e)
   rs_with_calls = filter(x->typeof(x.args[1]) == Expr && x.args[1].head == :call,rs)
@@ -56,18 +69,21 @@ end
 # A type that covers both Types and TypeVars
 AType = Union(Type,TypeVar)
 
-# given an Expr representing a method, get the type of each of the arguments in the signature
+# Returns the type of each argument in a Method's signature
+# Takes an Expr representing a Method, returns Vector{AType}
 function argumenttypes(e::Expr)
   argnames = Symbol[typeof(x) == Symbol ? x : x.args[1] for x in e.args[1]]
   argtuples = filter(x->x[1] in argnames, e.args[2][2]) #only arguments, no local vars
   AType[t[2] for t in argtuples]
 end
 
-# given an Expr, determine if it is calling a TopNode
-# (this affects how we should handle resolving the callee name)
+# Returns true if the Expr is a :call to a TopNode
+# Takes an Expr (or Any) and returns a Bool
 istop(e) = Base.is_expr(e,:call) && typeof(e.args[1]) == TopNode
 
-# given a call Expr (:call, :call1, :new), determine its return type
+# Returns the return type of an Expr (:call, :call1, :new)
+# Takes an Expr(call) and the Expr representing the method it occurs in
+# Returns an AType
 function returntype(e::Expr,context::Expr) #must be :call,:new,:call1
   if Base.is_expr(e,:new); return e.typ; end
   if Base.is_expr(e,:call1) && isa(e.args[1], TopNode); return e.typ; end
@@ -102,8 +118,8 @@ function returntype(e::Expr,context::Expr) #must be :call,:new,:call1
   return e.typ
 end
 
-# for an Expr `e` used as an argument to a call in function Expr `context`,
-# determine the type of `e`
+# Returns the type of an Expr
+# Takes an Expr and the Expr representing a Method it occurs in
 function argumenttype(e::Expr,context::Expr)
  if Base.is_expr(e,:call) || Base.is_expr(e,:new) || Base.is_expr(e,:call1)
    return returntype(e,context)
@@ -113,8 +129,8 @@ function argumenttype(e::Expr,context::Expr)
  return Any
 end
 
-# for a Symbol `s` used as an argument to a call in a function Expr `e`,
-# determine the type of `s`.
+# Returns the type of a Symbol used as an argument to a function call
+# Takes a Symbol and an Expr representing a Method it occurs in
 function argumenttype(s::Symbol,e::Expr)
   vartypes = [x[1] => x[2] for x in e.args[2][2]]
   s in vartypes ? (vartypes[@show s]) : Any
@@ -132,9 +148,9 @@ argumenttype(c::Char,e::Expr) = typeof(c)
 argumenttype(s::String,e::Expr) = typeof(s)
 argumenttype(i,e::Expr) = typeof(i) #catch all, hopefully for more literals
 
-# start, next, and done are the functions for-loops use to iterate
-# having implementations of them makes a type iterable
-# this defines iterating over a DataType to mean iterating over its descendants
+# Make Types Iterable
+# start, next, and done are the functions for-loops use to iterate.
+# This defines iterating over a DataType to mean iterating over its descendants
 # (breadth-first-search ordering)
 Base.start(t::DataType) = [t]
 function Base.next(t::DataType,arr::Vector{DataType})
@@ -144,12 +160,19 @@ function Base.next(t::DataType,arr::Vector{DataType})
 end
 Base.done(t::DataType,arr::Vector{DataType}) = length(arr) == 0
 
-# this is like the `methodswith` function from Base,
-# but it considers all descendants of the type
-# rather than the type itself (or the type + super types)
-# it produces a list of function names and statistics
-# about how many descendants implement that function
-# this is good for discovering implicit interfaces
+# Returns a list of Function names to implementation percentage.
+# By considering all the descendents of the provided type,
+# this function collects a list of functions implemented by at least one
+# considered type and calculates what percentage of the considered types
+# implements each function.
+#
+# Takes a DataType and returns a Vector{(Symbol,Float64)}
+# Keyword args:
+#   onlyleaves: If this is true, only concrete types are considered;
+#     if this is false, all descendent types are considered.
+#     (defaults to false)
+#   lim: The maximum length of the returned list. The lim functions with
+#     the highest implementation rate will be returned.
 function methodswithdescendants(t::DataType;onlyleaves::Bool=false,lim::Int=10)
   d = Dict{Symbol,Int}()
   count = 0
@@ -170,7 +193,9 @@ function methodswithdescendants(t::DataType;onlyleaves::Bool=false,lim::Int=10)
   l[1:min(lim,end)]
 end
 
-# check all the generic functions in a module
+# Run a function on each generic function of a Module.
+# Takes a Module, returns nothing.
+# The output of each run of the test function will be displayed.
 function checkallmodule(m::Module;test=checkreturntypes,kwargs...)
   score = 0
   for n in names(m)
@@ -184,7 +209,7 @@ function checkallmodule(m::Module;test=checkreturntypes,kwargs...)
   println("The total number of failed methods in $m is $score")
 end
 
-# use checkallmodule to implement the Module version of other checks
+# Use checkallmodule to implement the Module version of other checks
 checkreturntypes(m::Module;kwargs...) = checkallmodule(m;test=checkreturntypes,kwargs...)
 checklooptypes(m::Module) = checkallmodule(m;test=checklooptypes)
 checkmethodcalls(m::Module) = checkallmodule(m;test=checkmethodcalls)
