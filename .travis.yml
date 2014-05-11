@@ -15,4 +15,6 @@ script:
   - julia -e 'Pkg.init();Pkg.add("FactCheck");Pkg.checkout("FactCheck")'
   - julia -e 'run(`ln -s $(pwd()) $(Pkg.dir("TypeCheck"))`); Pkg.pin("TypeCheck"); Pkg.resolve()'
   - julia -e 'using TypeCheck; @assert isdefined(:TypeCheck); @assert typeof(TypeCheck) === Module'
-  - julia test/test.jl
+  - julia --code-coverage test/test.jl
+after_success:
+  - julia -e 'cd(Pkg.dir("TypeCheck")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
