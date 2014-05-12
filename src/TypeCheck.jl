@@ -477,4 +477,20 @@ function methodcalls(e::Expr)
   lines
 end
 
+# Return a list of all variables used on the left-hand-side of assignment (=)
+#
+# Arguments:
+#   e: an Expr representing a Method, as from code_typed
+#
+# Returns:
+#   a Set{Symbol}, where each element appears on the lhs of an assignment in e.
+#
+function find_lhs_variables(e::Expr)
+  output = Set{Symbol}()
+  for ex in body(e)
+   isa(ex,Expr) && ex.head == symbol("=") && push!(output,ex.args[1]) 
+  end
+  return output
+end
+
 end  #end module
