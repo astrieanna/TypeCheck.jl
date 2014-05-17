@@ -112,5 +112,45 @@ module TestTypeCheck
   facts("Check Method Calls: False Negatives") do
   end
 
+  facts("find_lhs_variables") do
+    function lhs1(x::Int)
+      x = 5
+      return y
+    end
+    @fact TypeCheck.find_lhs_variables(code_typed(lhs1,(Int,))[1]) => Set{Symbol}([:x])
+
+    function lhs2()
+      y = 5
+      true && (x = 42)
+      foo(y) && (z = 55)
+      return y
+    end
+    @fact TypeCheck.find_lhs_variables(code_typed(lhs2,())[1]) => Set{Symbol}([:x,:y,:z])
+  end
+
+  facts("find_rhs_variables") do
+    function rhs1(x::Int)
+      x = 5
+      return y
+    end
+    @fact TypeCheck.find_rhs_variables(code_typed(rhs1,(Int,))[1]) => Set{Symbol}([:y])
+    
+    function rhs2()
+      y = 5
+      true && (x = 42)
+      foo(y) && (z = 55)
+      return y
+    end
+    @fact TypeCheck.find_rhs_variables(code_typed(rhs2,())[1]) => Set{Symbol}([:y])
+
+    function rhs3()
+      y = 5
+      true && (x = y)
+      foo(y) && (z += y)
+      return w
+    end
+    @fact TypeCheck.find_rhs_variables(code_typed(rhs3,())[1]) => Set{Symbol}([:w,:y,:z])
+  end
+
   exitstatus()
 end
