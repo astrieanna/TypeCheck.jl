@@ -493,4 +493,45 @@ function find_lhs_variables(e::Expr)
   return output
 end
 
+# Given an Expression, finds variables used in it (on right-hand-side)
+#
+# Arguments: e: an Expr
+#
+# Returns: a Set{Symbol}, where each e is used in a rhs expression in e
+#
+function find_rhs_variables(e::Expr)
+  output = Set{Symbol}()
+
+  if e.head == :lambda
+    for ex in body(e)
+      union!(output,find_rhs_variables(ex))
+    end
+  elseif e.head == :(=)
+    for ex in e.args[2:end]  # skip lhs
+      union!(output,find_rhs_variables(ex))
+    end
+  elseif e.head == :return
+    output = find_rhs_variables(e.args[1])
+  elseif e.head == :call
+    start = 2  # skip function name
+    e.args[1] == TopNode(:box) && (start = 3)  # skip type name
+    for ex in e.args[start:end]
+      union!(output,@show find_rhs_variables(@show ex))
+    end
+  elseif e.head == :if
+   for ex in e.args # want to check condition, too
+     union!(output,find_rhs_variables(ex))
+   end
+  elseif e.head == :(::)
+    output = find_rhs_variables(e.args[1])
+  end
+
+  return output
+end
+
+# Recursive Base Cases, to simplify control flow in the Expr version
+find_rhs_variables(a) = Set{Symbol}()  # unhandled, should be an immediate value, like an Int.
+find_rhs_variables(s::Symbol) = Set{Symbol}([s])
+find_rhs_variables(s::SymbolNode) = Set{Symbol}([s.name])
+
 end  #end module
