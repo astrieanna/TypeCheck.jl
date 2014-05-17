@@ -516,7 +516,7 @@ function find_rhs_variables(e::Expr)
     start = 2  # skip function name
     e.args[1] == TopNode(:box) && (start = 3)  # skip type name
     for ex in e.args[start:end]
-      union!(output,@show find_rhs_variables(@show ex))
+      union!(output,find_rhs_variables(ex))
     end
   elseif e.head == :if
    for ex in e.args # want to check condition, too
