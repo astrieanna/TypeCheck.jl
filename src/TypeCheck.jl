@@ -534,4 +534,13 @@ find_rhs_variables(a) = Set{Symbol}()  # unhandled, should be an immediate value
 find_rhs_variables(s::Symbol) = Set{Symbol}([s])
 find_rhs_variables(s::SymbolNode) = Set{Symbol}([s.name])
 
+function unused_locals(e::Expr)
+  lhs = find_lhs_variables(e)
+  rhs = find_rhs_variables(e)
+  setdiff(lhs,rhs)
+end
+
+check_locals(f::Function) = all([check_locals(e) for e in code_typed(f)])
+check_locals(e::Expr) = isempty(unused_locals(e))
+
 end  #end module

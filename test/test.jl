@@ -152,5 +152,23 @@ module TestTypeCheck
     @fact TypeCheck.find_rhs_variables(code_typed(rhs3,())[1]) => Set{Symbol}([:w,:y,:z])
   end
 
+  facts("unused_locals") do
+    function fl1(x::String)
+      x *= "hello"
+      y = x + "hi"
+      return x
+    end
+    @fact TypeCheck.unused_locals(code_typed(fl1,(String,))[1]) => Set{Symbol}([:y])
+
+    function fl2(x)
+      answer = false
+      if (x > 10)
+        anwser = true
+      end
+      return answer
+    end
+    @fact TypeCheck.unused_locals(code_typed(fl2,(Int,))[1]) => Set{Symbol}([:anwser])
+  end
+
   exitstatus()
 end
