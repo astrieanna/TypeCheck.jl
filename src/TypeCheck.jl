@@ -6,6 +6,7 @@
 module TypeCheck
 export checkreturntypes, checklooptypes, checkmethodcalls,
   methodswithdescendants, checkmissingexports
+import Base.Callable
 
 ## Modifying functions from Base
 
@@ -16,7 +17,8 @@ export checkreturntypes, checklooptypes, checkmethodcalls,
 # For a Function, code_typed should return a list of Expr, on per method.
 
 # Return the type-inferred AST for each method of a generic Function.
-function Base.code_typed(f::Function)
+function Base.code_typed(f::Callable)
+  isa(f,DataType) && f.abstract && return Expr[] # abstract types have no constructors
   Expr[code_typed(m) for m in f.env]
 end
 
@@ -34,7 +36,7 @@ end
 # The whos function takes a namespace (a Module or the current one) and
 # prints out the bound names and types (variables, types, functions, consts).
 # I'm adding a version to print out function-local variables.
-# Specify a method via a Method, Function, or Function+argument-type-tuple.
+# Specify a method via a Method, unction, or Function+argument-type-tuple.
 function Base.whos(f,args...)
   for e in code_typed(f,args...)
     display(MethodSignature(e))
@@ -105,7 +107,7 @@ function returntype(e::Expr,context::Expr) #must be :call,:new,:call1
 
     if isdefined(Base,callee)
       f = eval(Base,callee)
-      if !isa(f,Function) || !isgeneric(f)
+      if !isa(f,Callable) || !isgeneric(f)
         return e.typ
       end
       fargtypes = tuple([argumenttype(ea,context) for ea in e.args[2:end]])
@@ -201,7 +203,7 @@ function checkallmodule(m::Module;test=checkreturntypes,kwargs...)
   for n in names(m,true,false)
     if isdefined(m,n)
       f = getfield(m,n)
-      if isgeneric(f) && typeof(f) == Function
+      if isgeneric(f) && isa(f,Callable)
         fm = test(f;mod=m,kwargs...)
         score += length(fm.methods)
         display(fm)
@@ -240,7 +242,7 @@ function Base.writemime(io, ::MIME"text/plain", x::FunctionSignature)
 end
 
 # given a function, run checkreturntypes on each method
-function checkreturntypes(f::Function;kwargs...)
+function checkreturntypes(f::Callable;kwargs...)
   results = MethodSignature[]
   for e in code_typed(f)
     (ms,b) = checkreturntype(e;kwargs...)
@@ -309,7 +311,7 @@ function Base.writemime(io, ::MIME"text/plain", x::LoopResults)
 end
 
 # for a given Function, run checklooptypes on each Method
-function checklooptypes(f::Function;kwargs...)
+function checklooptypes(f::Callable;kwargs...)
   lrs = LoopResult[]
   for e in code_typed(f)
     lr = checklooptypes(e)
@@ -412,7 +414,7 @@ end
 
 # given a Function, run `checkmethodcalls` on each Method
 # and collect the results into a FunctionCalls
-function checkmethodcalls(f::Function;kwargs...)
+function checkmethodcalls(f::Callable;kwargs...)
   calls = MethodCalls[]
   for m in f.env
     e = code_typed(m)
@@ -544,7 +546,7 @@ function unused_locals(e::Expr)
   setdiff(lhs,rhs)
 end
 
-check_locals(f::Function) = all([check_locals(e) for e in code_typed(f)])
+check_locals(f::Callable) = all([check_locals(e) for e in code_typed(f)])
 check_locals(e::Expr) = isempty(unused_locals(e))
 
 checkmissingexports(m::Module) = isempty(find_missing_exports(m))
@@ -561,5 +563,51 @@ function find_missing_exports(m::Module=Base, missing::Vector{(Module,Symbol)}=(
   end
   missing
 end
+
+typealias InterfaceDict Dict{DataType, Set{Symbol}}
+function extract_interfaces(m::Module=Base, ifaces::InterfaceDict=InterfaceDict())
+  for n in names(m)
+    if isdefined(m,n)
+      f = getfield(m,n)
+      if (isa(f,Callable) && isgeneric(f)) || (isa(f,Module) && f !== m)
+        extract_interfaces(f, ifaces)
+      end
+    end
+  end
+  ifaces
+end
+extract_interfaces(f::Callable) = extract_interfaces(f, InterfaceDict())
+extract_interfaces(f::Callable, ifaces::InterfaceDict) = extract_interfaces(code_typed(f), ifaces)
+function extract_interfaces(meths::Vector{Expr}, ifaces::InterfaceDict)
+  for m in meths
+    sigs = methodcalls(m)
+    for s in sigs
+      for t in s.argumenttypes
+        add_iface(t, s.name, ifaces)
+      end
+    end
+  end
+  ifaces
+end
+
+add_iface(t::TypeVar, f::Symbol, ifaces::InterfaceDict) = add_iface(t.ub, f, ifaces)
+add_iface(t::TypeConstructor, f::Symbol, ifaces::InterfaceDict) = add_iface(t.body, f, ifaces)
+function add_iface(t::UnionType, f::Symbol, ifaces::InterfaceDict)
+  for t in t.types
+    add_iface(t, f, ifaces)
+  end
+end
+add_iface(t::Tuple, f::Symbol, ifaces::InterfaceDict) = nothing #todo
+function add_iface(t::DataType, f::Symbol, ifaces::InterfaceDict)
+  t.abstract || return
+  if !(t in keys(ifaces))
+    ifaces[t] = fn = Set{Symbol}()
+  else
+    fn = ifaces[t]
+  end
+  push!(fn, f)
+  nothing
+end
+# todo: second pass to reduce {Real=>:abs, Integer=>:abs} to {Real=>abs} in ifaces
 
 end  #end module
