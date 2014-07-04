@@ -199,7 +199,7 @@ end
 function checkallmodule(m::Module;test=checkreturntypes,kwargs...)
   score = 0
   for n in names(m)
-    f = eval(m,n)
+    f = getfield(m,n)
     if isgeneric(f) && typeof(f) == Function
       fm = test(f;mod=m,kwargs...)
       score += length(fm.methods)
@@ -280,7 +280,7 @@ function isreturnbasedonvalues(e::Expr;mod=Base)
 end
 
 ## Checking that variables in loops have concrete types
-  
+
 type LoopResult
   msig::MethodSignature
   lines::Vector{(Symbol,Type)} #TODO should this be a specialized type? SymbolNode?
@@ -366,8 +366,8 @@ function loosetypes(lr::Vector)
           append!(es,e1.args)
         elseif typeof(e1) == SymbolNode && !isleaftype(e1.typ) && typeof(e1.typ) == UnionType
           push!(lines,(e1.name,e1.typ))
-        end 
-      end                          
+        end
+      end
     end
   end
   return lines
@@ -411,7 +411,7 @@ end
 # given a Function, run `checkmethodcalls` on each Method
 # and collect the results into a FunctionCalls
 function checkmethodcalls(f::Function;kwargs...)
-  calls = MethodCalls[] 
+  calls = MethodCalls[]
   for m in f.env
     e = code_typed(m)
     mc = checkmethodcalls(e,m;kwargs...)
@@ -448,7 +448,7 @@ function hasmatches(mod::Module,cs::CallSignature)
   return true
 end
 
-# Find any CallSignatures that indicate potential NoMethodErrors 
+# Find any CallSignatures that indicate potential NoMethodErrors
 function nomethoderrors(e::Expr,cs::Vector{CallSignature};mod=Base)
   output = CallSignature[]
   for callsig in cs
@@ -459,20 +459,23 @@ function nomethoderrors(e::Expr,cs::Vector{CallSignature};mod=Base)
   MethodCalls(MethodSignature(e),output)
 end
 
-# Look through the body of the function for `:call`s
-function methodcalls(e::Expr)
-  b = body(e)
-  lines = CallSignature[]
-  for s in b
-    if typeof(s) == Expr
-      if s.head == :return
-        append!(b, s.args)
-      elseif s.head == :call
-        if typeof(s.args[1]) == Symbol
-          push!(lines,CallSignature(s.args[1], [argumenttype(e1,e) for e1 in s.args[2:end]]))
-        end
-      end
+# Look through and Expr for `:call`s
+methodcalls(m::Expr) = methodcalls(body(m), m)
+function methodcalls(e::Expr, m::Expr)
+  lines = methodcalls(e.args, m)
+  if e.head === :call || e.head === :call1
+    if typeof(e.args[1]) == Symbol
+      push!(lines,CallSignature(e.args[1], [argumenttype(e1,m) for e1 in e.args[2:end]]))
     end
+  end
+  lines
+end
+function methodcalls(e::Vector, m::Expr)
+  lines = CallSignature[]
+  for a in e
+      if isa(a,Expr)
+          append!(lines, methodcalls(a::Expr, m))
+      end
   end
   lines
 end
@@ -488,7 +491,7 @@ end
 function find_lhs_variables(e::Expr)
   output = Set{Symbol}()
   for ex in body(e)
-   isa(ex,Expr) && ex.head == symbol("=") && push!(output,ex.args[1]) 
+   isa(ex,Expr) && ex.head == symbol("=") && push!(output,ex.args[1])
   end
   return output
 end
