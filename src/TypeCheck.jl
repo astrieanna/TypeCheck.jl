@@ -5,7 +5,7 @@
 # of things like the types of function-local variables.
 module TypeCheck
 export checkreturntypes, checklooptypes, checkmethodcalls,
-  methodswithdescendants
+  methodswithdescendants, checkmissingexports
 
 ## Modifying functions from Base
 
@@ -198,12 +198,14 @@ end
 # The output of each run of the test function will be displayed.
 function checkallmodule(m::Module;test=checkreturntypes,kwargs...)
   score = 0
-  for n in names(m)
-    f = getfield(m,n)
-    if isgeneric(f) && typeof(f) == Function
-      fm = test(f;mod=m,kwargs...)
-      score += length(fm.methods)
-      display(fm)
+  for n in names(m,true,false)
+    if isdefined(m,n)
+      f = getfield(m,n)
+      if isgeneric(f) && typeof(f) == Function
+        fm = test(f;mod=m,kwargs...)
+        score += length(fm.methods)
+        display(fm)
+      end
     end
   end
   println("The total number of failed methods in $m is $score")
@@ -460,21 +462,20 @@ function nomethoderrors(e::Expr,cs::Vector{CallSignature};mod=Base)
 end
 
 # Look through and Expr for `:call`s
-methodcalls(m::Expr) = methodcalls(body(m), m)
-function methodcalls(e::Expr, m::Expr)
-  lines = methodcalls(e.args, m)
+methodcalls(m::Expr) = methodcalls(body(m), m, CallSignature[])
+function methodcalls(e::Expr, m::Expr, lines::Vector{CallSignature})
   if e.head === :call || e.head === :call1
     if typeof(e.args[1]) == Symbol
       push!(lines,CallSignature(e.args[1], [argumenttype(e1,m) for e1 in e.args[2:end]]))
     end
   end
+  methodcalls(e.args, m, lines)
   lines
 end
-function methodcalls(e::Vector, m::Expr)
-  lines = CallSignature[]
+function methodcalls(e::Vector, m::Expr, lines::Vector{CallSignature})
   for a in e
       if isa(a,Expr)
-          append!(lines, methodcalls(a::Expr, m))
+          methodcalls(a::Expr, m, lines)
       end
   end
   lines
@@ -545,5 +546,20 @@ end
 
 check_locals(f::Function) = all([check_locals(e) for e in code_typed(f)])
 check_locals(e::Expr) = isempty(unused_locals(e))
+
+checkmissingexports(m::Module) = isempty(find_missing_exports(m))
+function find_missing_exports(m::Module=Base, missing::Vector{(Module,Symbol)}=(Module,Symbol)[])
+  for n in names(m,true,false)
+    if isdefined(m,n)
+      f = getfield(m,n)
+      if isa(f,Module) && f !== m
+        find_missing_exports(f, missing)
+      end
+    else
+      push!(missing,(m,n))
+    end
+  end
+  missing
+end
 
 end  #end module
