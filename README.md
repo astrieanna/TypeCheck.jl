@@ -8,6 +8,8 @@ Type-based static analysis for the Julia programming language.
 There are three main checks you can run: `checkreturntypes`, `checklooptypes`, and `checkmethodcalls`.
 Running a check on a function checks each method; running a check on a module checks each function (by checking each method of each function).
 
+### Installing This Package
+
 To use any of these functions, you'll need to `Pkg.add("TypeCheck")` once to install the package on your computer and then import it using `using TypeCheck`. You'll need to re-import every time you restart the REPL.
 
 ### `checkreturntypes`: do the return types of your functions depend on the types, not the values of your arguments?
