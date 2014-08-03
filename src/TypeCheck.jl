@@ -5,7 +5,8 @@
 # of things like the types of function-local variables.
 module TypeCheck
 export checkreturntypes, checklooptypes, checkmethodcalls,
-  methodswithdescendants
+  methodswithdescendants, checkmissingexports
+import Base.Callable
 
 ## Modifying functions from Base
 
@@ -16,7 +17,8 @@ export checkreturntypes, checklooptypes, checkmethodcalls,
 # For a Function, code_typed should return a list of Expr, on per method.
 
 # Return the type-inferred AST for each method of a generic Function.
-function Base.code_typed(f::Function)
+function Base.code_typed(f::Callable)
+  isa(f,DataType) && f.abstract && return Expr[] # abstract types have no constructors
   Expr[code_typed(m) for m in f.env]
 end
 
@@ -34,7 +36,7 @@ end
 # The whos function takes a namespace (a Module or the current one) and
 # prints out the bound names and types (variables, types, functions, consts).
 # I'm adding a version to print out function-local variables.
-# Specify a method via a Method, Function, or Function+argument-type-tuple.
+# Specify a method via a Method, unction, or Function+argument-type-tuple.
 function Base.whos(f,args...)
   for e in code_typed(f,args...)
     display(MethodSignature(e))
@@ -105,7 +107,7 @@ function returntype(e::Expr,context::Expr) #must be :call,:new,:call1
 
     if isdefined(Base,callee)
       f = eval(Base,callee)
-      if !isa(f,Function) || !isgeneric(f)
+      if !isa(f,Callable) || !isgeneric(f)
         return e.typ
       end
       fargtypes = tuple([argumenttype(ea,context) for ea in e.args[2:end]])
@@ -198,12 +200,14 @@ end
 # The output of each run of the test function will be displayed.
 function checkallmodule(m::Module;test=checkreturntypes,kwargs...)
   score = 0
-  for n in names(m)
-    f = eval(m,n)
-    if isgeneric(f) && typeof(f) == Function
-      fm = test(f;mod=m,kwargs...)
-      score += length(fm.methods)
-      display(fm)
+  for n in names(m,true,false)
+    if isdefined(m,n)
+      f = getfield(m,n)
+      if isgeneric(f) && isa(f,Callable)
+        fm = test(f;mod=m,kwargs...)
+        score += length(fm.methods)
+        display(fm)
+      end
     end
   end
   println("The total number of failed methods in $m is $score")
@@ -238,7 +242,7 @@ function Base.writemime(io, ::MIME"text/plain", x::FunctionSignature)
 end
 
 # given a function, run checkreturntypes on each method
-function checkreturntypes(f::Function;kwargs...)
+function checkreturntypes(f::Callable;kwargs...)
   results = MethodSignature[]
   for e in code_typed(f)
     (ms,b) = checkreturntype(e;kwargs...)
@@ -280,7 +284,7 @@ function isreturnbasedonvalues(e::Expr;mod=Base)
 end
 
 ## Checking that variables in loops have concrete types
-  
+
 type LoopResult
   msig::MethodSignature
   lines::Vector{(Symbol,Type)} #TODO should this be a specialized type? SymbolNode?
@@ -307,7 +311,7 @@ function Base.writemime(io, ::MIME"text/plain", x::LoopResults)
 end
 
 # for a given Function, run checklooptypes on each Method
-function checklooptypes(f::Function;kwargs...)
+function checklooptypes(f::Callable;kwargs...)
   lrs = LoopResult[]
   for e in code_typed(f)
     lr = checklooptypes(e)
@@ -366,8 +370,8 @@ function loosetypes(lr::Vector)
           append!(es,e1.args)
         elseif typeof(e1) == SymbolNode && !isleaftype(e1.typ) && typeof(e1.typ) == UnionType
           push!(lines,(e1.name,e1.typ))
-        end 
-      end                          
+        end
+      end
     end
   end
   return lines
@@ -410,8 +414,8 @@ end
 
 # given a Function, run `checkmethodcalls` on each Method
 # and collect the results into a FunctionCalls
-function checkmethodcalls(f::Function;kwargs...)
-  calls = MethodCalls[] 
+function checkmethodcalls(f::Callable;kwargs...)
+  calls = MethodCalls[]
   for m in f.env
     e = code_typed(m)
     mc = checkmethodcalls(e,m;kwargs...)
@@ -448,7 +452,7 @@ function hasmatches(mod::Module,cs::CallSignature)
   return true
 end
 
-# Find any CallSignatures that indicate potential NoMethodErrors 
+# Find any CallSignatures that indicate potential NoMethodErrors
 function nomethoderrors(e::Expr,cs::Vector{CallSignature};mod=Base)
   output = CallSignature[]
   for callsig in cs
@@ -459,20 +463,22 @@ function nomethoderrors(e::Expr,cs::Vector{CallSignature};mod=Base)
   MethodCalls(MethodSignature(e),output)
 end
 
-# Look through the body of the function for `:call`s
-function methodcalls(e::Expr)
-  b = body(e)
-  lines = CallSignature[]
-  for s in b
-    if typeof(s) == Expr
-      if s.head == :return
-        append!(b, s.args)
-      elseif s.head == :call
-        if typeof(s.args[1]) == Symbol
-          push!(lines,CallSignature(s.args[1], [argumenttype(e1,e) for e1 in s.args[2:end]]))
-        end
-      end
+# Look through and Expr for `:call`s
+methodcalls(m::Expr) = methodcalls(body(m), m, CallSignature[])
+function methodcalls(e::Expr, m::Expr, lines::Vector{CallSignature})
+  if e.head === :call || e.head === :call1
+    if typeof(e.args[1]) == Symbol
+      push!(lines,CallSignature(e.args[1], [argumenttype(e1,m) for e1 in e.args[2:end]]))
     end
+  end
+  methodcalls(e.args, m, lines)
+  lines
+end
+function methodcalls(e::Vector, m::Expr, lines::Vector{CallSignature})
+  for a in e
+      if isa(a,Expr)
+          methodcalls(a::Expr, m, lines)
+      end
   end
   lines
 end
@@ -488,7 +494,7 @@ end
 function find_lhs_variables(e::Expr)
   output = Set{Symbol}()
   for ex in body(e)
-   isa(ex,Expr) && ex.head == symbol("=") && push!(output,ex.args[1]) 
+   isa(ex,Expr) && ex.head == symbol("=") && push!(output,ex.args[1])
   end
   return output
 end
@@ -540,7 +546,68 @@ function unused_locals(e::Expr)
   setdiff(lhs,rhs)
 end
 
-check_locals(f::Function) = all([check_locals(e) for e in code_typed(f)])
+check_locals(f::Callable) = all([check_locals(e) for e in code_typed(f)])
 check_locals(e::Expr) = isempty(unused_locals(e))
+
+checkmissingexports(m::Module) = isempty(find_missing_exports(m))
+function find_missing_exports(m::Module=Base, missing::Vector{(Module,Symbol)}=(Module,Symbol)[])
+  for n in names(m,true,false)
+    if isdefined(m,n)
+      f = getfield(m,n)
+      if isa(f,Module) && f !== m
+        find_missing_exports(f, missing)
+      end
+    else
+      push!(missing,(m,n))
+    end
+  end
+  missing
+end
+
+typealias InterfaceDict Dict{DataType, Set{Symbol}}
+function extract_interfaces(m::Module=Base, ifaces::InterfaceDict=InterfaceDict())
+  for n in names(m)
+    if isdefined(m,n)
+      f = getfield(m,n)
+      if (isa(f,Callable) && isgeneric(f)) || (isa(f,Module) && f !== m)
+        extract_interfaces(f, ifaces)
+      end
+    end
+  end
+  ifaces
+end
+extract_interfaces(f::Callable) = extract_interfaces(f, InterfaceDict())
+extract_interfaces(f::Callable, ifaces::InterfaceDict) = extract_interfaces(code_typed(f), ifaces)
+function extract_interfaces(meths::Vector{Expr}, ifaces::InterfaceDict)
+  for m in meths
+    sigs = methodcalls(m)
+    for s in sigs
+      for t in s.argumenttypes
+        add_iface(t, s.name, ifaces)
+      end
+    end
+  end
+  ifaces
+end
+
+add_iface(t::TypeVar, f::Symbol, ifaces::InterfaceDict) = add_iface(t.ub, f, ifaces)
+add_iface(t::TypeConstructor, f::Symbol, ifaces::InterfaceDict) = add_iface(t.body, f, ifaces)
+function add_iface(t::UnionType, f::Symbol, ifaces::InterfaceDict)
+  for t in t.types
+    add_iface(t, f, ifaces)
+  end
+end
+add_iface(t::Tuple, f::Symbol, ifaces::InterfaceDict) = nothing #todo
+function add_iface(t::DataType, f::Symbol, ifaces::InterfaceDict)
+  t.abstract || return
+  if !(t in keys(ifaces))
+    ifaces[t] = fn = Set{Symbol}()
+  else
+    fn = ifaces[t]
+  end
+  push!(fn, f)
+  nothing
+end
+# todo: second pass to reduce {Real=>:abs, Integer=>:abs} to {Real=>abs} in ifaces
 
 end  #end module
